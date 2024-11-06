@@ -30,6 +30,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
   },
+  checkmark: {
+    position: "absolute",
+    top: "50%", // Center the checkmark vertically
+    left: "50%", // Center the checkmark horizontally
+    fontSize: 20, // Large checkmark
+    color: "green", // Green color for the checkmark
+    transform: [{ translateX: -50 }, { translateY: -50 }], // Adjust positioning to truly center
+  },
 });
 
 export default styles;
