@@ -9,6 +9,7 @@ export default function CameraPage() {
   const [permission, requestPermission] = useCameraPermissions();
   const [barcodeScanned, setBarcodeScanned] = useState(false);
   const [scanCooldown, setScanCooldown] = useState(false);
+  const [barcodeData, setBarcodeData] = useState("");
 
   if (!permission) {
     // Camera permissions are still loading.
