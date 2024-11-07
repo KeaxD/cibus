@@ -2,6 +2,8 @@ import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { useState } from "react";
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { BACKEND_URI } from "@env";
+
 import styles from "../styles/homepage";
 
 export default function CameraPage() {
@@ -9,7 +11,7 @@ export default function CameraPage() {
   const [permission, requestPermission] = useCameraPermissions();
   const [barcodeScanned, setBarcodeScanned] = useState(false);
   const [scanCooldown, setScanCooldown] = useState(false);
-  const [barcodeData, setBarcodeData] = useState("");
+  const [productData, setProductData] = useState(null);
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -32,7 +34,7 @@ export default function CameraPage() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
-  const handleBarScan = ({ data }) => {
+  const handleBarScan = async ({ data }) => {
     if (scanCooldown) {
       return;
     }
@@ -44,11 +46,47 @@ export default function CameraPage() {
 
     setTimeout(() => {
       setBarcodeScanned(false);
-    }, 1000); // Hide checkmark after 2 seconds
+    }, 1000); // Hide checkmark after 1 seconds
+
+    //Request
+    await sendBarcodeToBackend(data);
 
     setTimeout(() => {
       setScanCooldown(false);
-    }, 1000);
+    }, 2000);
+  };
+
+  function addLeadingZeroIfNeeded(barcode) {
+    // Check if the barcode has exactly 12 digits
+    if (barcode.length === 12) {
+      // Add a leading zero
+      return "0" + barcode;
+    }
+    return barcode;
+  }
+
+  const sendBarcodeToBackend = async (barcodeData) => {
+    const formattedBarcode = addLeadingZeroIfNeeded(barcodeData);
+    try {
+      const response = await fetch(`${BACKEND_URI}/products/add-product`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          barcode: formattedBarcode,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json(); // Parse the JSON response
+        setProductData(data);
+        console.log("Server response successfully received");
+      } else {
+        console.log(response, "Server Error");
+      }
+    } catch (error) {
+      console.error("Error sending barcode to backend:", error);
+    }
   };
 
   return (
@@ -67,6 +105,11 @@ export default function CameraPage() {
           </TouchableOpacity>
         </View>
       </CameraView>
+      {productData && (
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{productData.productName}</Text>
+        </View>
+      )}
     </View>
   );
 }

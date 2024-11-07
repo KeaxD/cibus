@@ -38,6 +38,20 @@ const styles = StyleSheet.create({
     color: "green", // Green color for the checkmark
     transform: [{ translateX: -50 }, { translateY: -50 }], // Adjust positioning to truly center
   },
+  productInfo: {
+    padding: 20,
+    alignItems: "center",
+  },
+  productName: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  productBrand: {
+    fontSize: 16,
+  },
+  productIngredients: {
+    fontSize: 14,
+  },
 });
 
 export default styles;
