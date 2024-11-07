@@ -2,7 +2,7 @@ POST http://192.168.0.37:3000/products/add-product
 Content-Type: application/json
 
 {
-"barcode": "3017620422003"
+"barcode": "0014100054122"
 }
 
 ### 
