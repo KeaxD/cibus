@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 15,
     flex: 1,
+    textAlign: "center",
   },
   row: {
     flexDirection: "row",
@@ -33,6 +34,26 @@ const styles = StyleSheet.create({
   cell: {
     fontSize: 14,
     flex: 1,
+    textAlign: "center",
+    justifyContent: "center",
+  },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 1,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: "blue",
+    height: 40,
+    width: 50,
+  },
+  buttonText: {
+    fontSize: 14,
+    lineHeight: 21,
+    fontWeight: "bold",
+    letterSpacing: 0.25,
+    color: "white",
   },
 });
 
