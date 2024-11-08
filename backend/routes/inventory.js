@@ -4,11 +4,22 @@ const Product = require("../models/product");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json({ message: "Welcome to the inventory section!" });
+// GET ALL Route
+router.get("/", async (req, res) => {
+  try {
+    console.log("Querying the database...");
+    const inventory = await Inventory.find().populate("product");
+    if (!inventory) {
+      console.log("Couldn't query the database");
+    }
+    console.log("Found the database, sending the data...");
+    res.json({ inventory });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching inventory", error });
+  }
 });
 
-// Route to add a product to the inventory
+// Route to add details to a product to the inventory
 router.post("/add-to-inventory", async (req, res) => {
   const { barcode, quantity, location, expirationDate } = req.body;
 
@@ -46,16 +57,6 @@ router.post("/add-to-inventory", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error adding product to inventory", error });
-  }
-});
-
-// Route to get all inventory items
-router.get("/inventory", async (req, res) => {
-  try {
-    const inventory = await Inventory.find().populate("product");
-    res.json({ inventory });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching inventory", error });
   }
 });
 

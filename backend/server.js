@@ -27,6 +27,8 @@ mongoose
     //Products routes
     app.use("/products", routes.products);
 
+    app.use("/inventory", routes.inventory);
+
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
