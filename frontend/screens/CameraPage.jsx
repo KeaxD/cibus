@@ -107,7 +107,12 @@ export default function CameraPage() {
       </CameraView>
       {productData && (
         <View style={styles.productInfo}>
-          <Text style={styles.productName}>{productData.productName}</Text>
+          <Text style={styles.productName}>
+            {productData.product.productName}
+          </Text>
+          <Text style={styles.productBrand}>
+            Current Quantity: {productData.inventory.quantity}
+          </Text>
         </View>
       )}
     </View>

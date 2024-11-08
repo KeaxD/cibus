@@ -1,11 +1,51 @@
 const express = require("express");
 const axios = require("axios");
 const Product = require("../models/product");
+const Inventory = require("../models/inventory");
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
   res.json({ message: "Welcome to the products section!" });
+});
+
+router.post("/add-product", async (req, res) => {
+  const { barcode } = req.body;
+
+  try {
+    let product = await checkDatabaseforProduct(barcode);
+
+    if (!product) {
+      // Fetch product data from Open Food Facts
+      console.log("Fetching data from OpenFoodFacts");
+      const response = await axios.get(
+        `https://world.openfoodfacts.net/api/v2/product/${barcode}`
+      );
+
+      if (response.data.status !== 1) {
+        return res
+          .status(404)
+          .json({ message: "Product not found in the API" });
+        //Will need to handle that so the user can add it manually if needed
+      }
+      // Save product data in the database
+      product = await saveProductDataInDatabase(response);
+      console.log("Product successfully saved in the Database");
+    }
+
+    // Add the product to the inventory
+    const inventoryItem = await addProductToInventory(product, (quantity = 1));
+
+    // Respond with the product and inventory details
+    res.status(201).json({
+      message: "Product added to inventory",
+      product: productResponseJSON(product),
+      inventory: inventoryItem,
+    });
+  } catch (error) {
+    console.error("Error fetching product data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 async function checkDatabaseforProduct(barcode) {
@@ -55,37 +95,27 @@ async function saveProductDataInDatabase(response) {
   return newProduct;
 }
 
-router.post("/add-product", async (req, res) => {
-  const { barcode } = req.body;
-
+async function addProductToInventory(product, quantity) {
   try {
-    let product = await checkDatabaseforProduct(barcode);
-
-    if (product) {
-      // Respond with the existing product
-      console.log("Responding with the result");
-      return res.json(productResponseJSON(product));
+    // Find the inventory item by product ID if it's already in the inventory
+    let inventoryItem = await Inventory.findOne({ product: product._id });
+    if (inventoryItem) {
+      inventoryItem.quantity++;
+      await inventoryItem.save();
+      return inventoryItem;
     }
 
-    // Fetch product data from Open Food Facts
+    // Create a new inventory item
+    const newInventoryItem = new Inventory({
+      product: product._id,
+      quantity,
+    });
 
-    console.log("Fetching data from OpenFoodFacts");
-    const response = await axios.get(
-      `https://world.openfoodfacts.net/api/v2/product/${barcode}`
-    );
-
-    if (response.data.status === 1) {
-      const newProduct = await saveProductDataInDatabase(response);
-
-      // Send back the new product details after saving
-      return res.json(productResponseJSON(newProduct));
-    } else {
-      return res.status(404).json({ message: "Product not found in the API" });
-    }
+    await newInventoryItem.save();
+    return newInventoryItem;
   } catch (error) {
-    console.error("Error fetching product data:", error);
-    res.status(500).json({ message: "Internal server error" });
+    throw new Error("Error adding product to inventory: " + error.message);
   }
-});
+}
 
 module.exports = router;
