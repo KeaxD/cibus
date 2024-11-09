@@ -7,6 +7,7 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
 import { BACKEND_URI } from "@env";
 
@@ -15,6 +16,9 @@ export default function Inventory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null); // State to handle editing
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [dateField, setDateField] = useState(null);
 
   useEffect(() => {
     const fetchInventory = async () => {
@@ -65,7 +69,7 @@ export default function Inventory() {
       const response = await fetch(
         `${BACKEND_URI}/inventory/${editingItem._id}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
@@ -100,14 +104,15 @@ export default function Inventory() {
     }));
   };
 
-  const handleProductChange = (field, value) => {
-    setEditingItem((prevItem) => ({
-      ...prevItem,
-      product: {
-        ...prevItem.product,
-        [field]: value,
-      },
-    }));
+  const changeTime = (e, selectedDate) => {
+    setDate(selectedDate);
+    setShowDatePicker(false);
+    handleChange(dateField, selectedDate);
+  };
+
+  const openDatePickerForField = (field) => {
+    setDateField(field);
+    setShowDatePicker(true);
   };
 
   const formatDate = (dateString) => {
@@ -123,8 +128,8 @@ export default function Inventory() {
           <>
             <TextInput
               style={[styles.cell, { width: 150, textAlign: "left" }]}
-              value={editingItem.product.name}
-              onChangeText={(text) => handleProductChange("name", text)}
+              value={editingItem.name}
+              onChangeText={(text) => handleChange("name", text)}
             />
             <TextInput
               style={[styles.cell, { width: 45 }]}
@@ -132,21 +137,24 @@ export default function Inventory() {
               onChangeText={(text) => handleChange("quantity", text)}
               keyboardType="numeric"
             />
+            <Pressable
+              style={[styles.cell, { width: 110 }]}
+              onPress={() => openDatePickerForField("dateAdded")}
+            >
+              <Text>{formatDate(editingItem.dateAdded)}</Text>
+            </Pressable>
             <TextInput
               style={[styles.cell, { width: 100 }]}
               value={editingItem.location}
               onChangeText={(text) => handleChange("location", text)}
             />
-            <TextInput
+
+            <Pressable
               style={[styles.cell, { width: 110 }]}
-              value={formatDate(editingItem.dateAdded)}
-              onChangeText={(text) => handleChange("dateAdded", text)}
-            />
-            <TextInput
-              style={[styles.cell, { width: 110 }]}
-              value={formatDate(editingItem.expirationDate)}
-              onChangeText={(text) => handleChange("expirationDate", text)}
-            />
+              onPress={() => openDatePickerForField("expirationDate")}
+            >
+              <Text>{formatDate(editingItem.expirationDate)}</Text>
+            </Pressable>
             <Pressable
               style={styles.button}
               title="Save"
@@ -158,7 +166,7 @@ export default function Inventory() {
         ) : (
           <>
             <Text style={[styles.cell, { width: 150, textAlign: "left" }]}>
-              {item.product.name}
+              {item.name}
             </Text>
             <Text style={[styles.cell, { width: 45 }]}> {item.quantity}</Text>
             <Text style={[styles.cell, { width: 110 }]}>
@@ -183,25 +191,48 @@ export default function Inventory() {
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal>
-        <View style={styles.listContainer}>
-          <View style={styles.header}>
-            <Text
-              style={[styles.headerText, { width: 150, textAlign: "left" }]}
-            >
-              Name
-            </Text>
-            <Text style={[styles.headerText, { width: 45 }]}>Qty</Text>
-            <Text style={[styles.headerText, { width: 110 }]}>Date Added</Text>
-            <Text style={[styles.headerText, { width: 100 }]}>Location</Text>
-            <Text style={[styles.headerText, { width: 110 }]}>
-              Expiration Date
-            </Text>
-            <Text style={[styles.headerText, { width: 50 }]}></Text>
+      {inventoryItems.length > 0 ? (
+        <>
+          <ScrollView horizontal>
+            <View style={styles.listContainer}>
+              <View style={styles.header}>
+                <Text
+                  style={[styles.headerText, { width: 150, textAlign: "left" }]}
+                >
+                  Name
+                </Text>
+                <Text style={[styles.headerText, { width: 45 }]}>Qty</Text>
+                <Text style={[styles.headerText, { width: 110 }]}>
+                  Date Added
+                </Text>
+                <Text style={[styles.headerText, { width: 100 }]}>
+                  Location
+                </Text>
+                <Text style={[styles.headerText, { width: 110 }]}>
+                  Expiration Date
+                </Text>
+                <Text style={[styles.headerText, { width: 50 }]}></Text>
+              </View>
+              <FlatList data={inventoryItems} renderItem={renderItem} />
+            </View>
+          </ScrollView>
+          {showDatePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              is24Hour={true}
+              display="default"
+              onChange={changeTime}
+            />
+          )}
+        </>
+      ) : (
+        <>
+          <View>
+            <Text>Nothing in your inventory</Text>
           </View>
-          <FlatList data={inventoryItems} renderItem={renderItem} />
-        </View>
-      </ScrollView>
+        </>
+      )}
     </View>
   );
 }
