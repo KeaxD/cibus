@@ -13,7 +13,7 @@ router.post("/add-product", async (req, res) => {
   const { barcode } = req.body;
 
   try {
-    let product = await checkDatabaseforProduct(barcode);
+    let product = await checkDatabaseForProduct(barcode);
 
     if (!product) {
       // Fetch product data from Open Food Facts
@@ -48,7 +48,7 @@ router.post("/add-product", async (req, res) => {
   }
 });
 
-async function checkDatabaseforProduct(barcode) {
+async function checkDatabaseForProduct(barcode) {
   try {
     // Check if the product already exists in the database
     console.log("Checking the database for the product: ", {
@@ -108,6 +108,7 @@ async function addProductToInventory(product, quantity) {
     // Create a new inventory item
     const newInventoryItem = new Inventory({
       product: product._id,
+      name: product.name,
       quantity,
     });
 
