@@ -7,6 +7,7 @@ import {
   Pressable,
   TextInput,
   RefreshControl,
+  Modal,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
@@ -22,6 +23,7 @@ export default function Inventory() {
   const [dateField, setDateField] = useState(null);
   const [editingMode, setEditingMode] = useState(false);
   const [updatingInventory, setUpdatingInventory] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     fetchInventory();
@@ -124,6 +126,7 @@ export default function Inventory() {
       if (response.ok) {
         fetchInventory();
         console.log(response.json());
+        setModalVisible(false);
       }
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -191,12 +194,47 @@ export default function Inventory() {
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
             <Pressable
-              style={styles.buttonDelete}
+              style={[styles.button, styles.buttonDelete]}
               title="Delete"
-              onPress={handleDelete}
+              onPress={() => setModalVisible(true)}
             >
               <Text style={styles.buttonText}>Delete</Text>
             </Pressable>
+
+            {modalVisible && (
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                  setModalVisible(false);
+                }}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <Text style={styles.modalText}>
+                      Are you sure you want to delete {item.name}?
+                    </Text>
+                    <View
+                      style={[{ flexDirection: "row", paddingVertical: 10 }]}
+                    >
+                      <Pressable
+                        style={[styles.button]}
+                        onPress={() => setModalVisible(false)}
+                      >
+                        <Text style={styles.buttonText}>No</Text>
+                      </Pressable>
+                      <Pressable
+                        style={[styles.button, styles.buttonDelete]}
+                        onPress={() => setModalVisible(handleDelete)}
+                      >
+                        <Text style={styles.buttonText}>Yes</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+            )}
           </>
         ) : (
           <>

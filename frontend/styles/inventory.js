@@ -48,20 +48,11 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: "blue",
     height: 40,
-    width: 50,
+    width: 54,
     marginHorizontal: 8,
   },
   buttonDelete: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 1,
-    paddingHorizontal: 8,
-    borderRadius: 4,
-    elevation: 3,
     backgroundColor: "red",
-    height: 40,
-    width: 54,
-    marginHorizontal: 8,
   },
   buttonText: {
     fontSize: 14,
@@ -81,6 +72,28 @@ const styles = StyleSheet.create({
     elevation: 0.5,
     alignItems: "center",
     backgroundColor: "#f5f5f5",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 30,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    fontSize: 16,
   },
 });
 
