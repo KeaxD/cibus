@@ -321,7 +321,7 @@ export default function Inventory({ route }) {
         </>
       ) : (
         <>
-          <View>
+          <View style={[styles.listContainer, { alignItems: "center" }]}>
             <Text>Nothing in your inventory</Text>
           </View>
         </>

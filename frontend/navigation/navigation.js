@@ -11,8 +11,16 @@ function BottomTabGroup() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Home" component={HomePage} />
-      <Tab.Screen name="Camera" component={Camera} />
-      <Tab.Screen name="InventoryDrawer" component={InventoryDrawer} />
+      <Tab.Screen
+        name="Camera"
+        component={Camera}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Inventory"
+        component={InventoryDrawer}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
