@@ -1,6 +1,5 @@
 const express = require("express");
 const Inventory = require("../models/inventory");
-const Product = require("../models/product");
 
 const router = express.Router();
 
@@ -9,6 +8,22 @@ router.get("/", async (req, res) => {
   try {
     console.log("Querying the database...");
     const inventory = await Inventory.find().populate("product");
+    if (!inventory) {
+      console.log("Couldn't query the database");
+    }
+    console.log("Found the database, sending the data...");
+    res.json({ inventory });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching inventory", error });
+  }
+});
+
+// GET a Category Route
+router.get("/:category", async (req, res) => {
+  try {
+    const { category } = req.params;
+    console.log("Querying the database...");
+    const inventory = await getProductsByCategory(category);
     if (!inventory) {
       console.log("Couldn't query the database");
     }
@@ -62,5 +77,16 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
+
+async function getProductsByCategory(category) {
+  try {
+    const inventoryItems = await Inventory.find({
+      categories: { $in: [category] },
+    });
+    return inventoryItems;
+  } catch (error) {
+    console.error("Error finding items by category:", error);
+  }
+}
 
 module.exports = router;

@@ -13,7 +13,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
 import { BACKEND_URI } from "@env";
 
-export default function Inventory() {
+export default function Inventory({ route }) {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,19 +25,25 @@ export default function Inventory() {
   const [updatingInventory, setUpdatingInventory] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
+  let category = route.params?.category;
+
   useEffect(() => {
     fetchInventory();
-  }, []);
+  }, [category]);
 
   const fetchInventory = async () => {
     try {
       console.log("Sending the request....");
-      const response = await fetch(`${BACKEND_URI}/inventory/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      console.log(category);
+      const response = await fetch(
+        `${BACKEND_URI}/inventory/${category || ""}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.json();
         console.log("Response succesful");
@@ -292,11 +298,11 @@ export default function Inventory() {
                 <Text style={[styles.headerText, { width: 110 }]}>
                   Expiration Date
                 </Text>
-                <Text style={[styles.headerText, { width: 58 }]}></Text>
+                <Text style={[styles.headerText, { width: 54 }]}></Text>
 
                 {editingMode ? (
                   <>
-                    <Text style={[styles.headerText, { width: 62 }]}></Text>
+                    <Text style={[styles.headerText, { width: 54 }]}></Text>
                   </>
                 ) : null}
               </View>

@@ -9,7 +9,7 @@ Content-Type: application/json
 GET http://localhost:3000/products/
 
 ### 
-GET http://localhost:3000/inventory/
+GET http://localhost:3000/inventory/Snacks
 
 ### 
 DELETE http://localhost:3000/inventory/672edb6a2aea1d00c27e319b

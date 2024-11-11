@@ -96,6 +96,10 @@ async function saveProductDataInDatabase(response) {
   return newProduct;
 }
 
+function processCategoryString(categoriesString) {
+  return categoriesString.split(",").map((category) => category.trim());
+}
+
 async function addProductToInventory(product, quantity) {
   try {
     // Find the inventory item by product ID if it's already in the inventory
@@ -111,6 +115,7 @@ async function addProductToInventory(product, quantity) {
       product: product._id,
       name: product.name,
       quantity,
+      categories: processCategoryString(product.categories),
     });
 
     await newInventoryItem.save();

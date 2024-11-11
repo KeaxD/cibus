@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#e1e1e1",
+    paddingHorizontal: 6,
   },
   headerText: {
     fontSize: 15,
@@ -23,11 +24,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 8,
-    marginHorizontal: 1,
+    marginVertical: 2,
     elevation: 1,
     borderRadius: 3,
-    paddingVertical: 10,
+    paddingVertical: 8,
     backgroundColor: "#fff",
     paddingHorizontal: 6,
     alignItems: "center",
