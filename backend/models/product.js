@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
     proteins: Number,
     salt: Number,
   },
+  categories: { type: String },
 });
 
 module.exports = mongoose.model("Product", productSchema);

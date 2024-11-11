@@ -88,6 +88,7 @@ async function saveProductDataInDatabase(response) {
       proteins: productData.nutriments.proteins,
       salt: productData.nutriments.salt,
     },
+    categories: productData.categories,
   });
 
   await newProduct.save();
