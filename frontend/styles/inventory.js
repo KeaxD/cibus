@@ -30,12 +30,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "#fff",
     paddingHorizontal: 6,
+    alignItems: "center",
   },
   cell: {
     fontSize: 14,
     flex: 1,
     textAlign: "center",
     justifyContent: "center",
+    marginHorizontal: 3,
   },
   button: {
     alignItems: "center",
@@ -47,6 +49,19 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
     height: 40,
     width: 50,
+    marginHorizontal: 8,
+  },
+  buttonDelete: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 1,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: "red",
+    height: 40,
+    width: 54,
+    marginHorizontal: 8,
   },
   buttonText: {
     fontSize: 14,
@@ -54,6 +69,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 0.25,
     color: "white",
+  },
+  cellEdit: {
+    fontSize: 14,
+    flex: 1,
+    textAlign: "center",
+    justifyContent: "center",
+    height: 40,
+    marginHorizontal: 5,
+    borderRadius: 1,
+    elevation: 0.5,
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
 });
 

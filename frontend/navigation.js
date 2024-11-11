@@ -1,5 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import HomePage from "./screens/HomePage";
 import Camera from "./screens/CameraPage";
 import Inventory from "./screens/Inventory";

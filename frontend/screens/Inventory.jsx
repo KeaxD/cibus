@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -6,6 +6,7 @@ import {
   FlatList,
   Pressable,
   TextInput,
+  RefreshControl,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
@@ -19,33 +20,35 @@ export default function Inventory() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [date, setDate] = useState(new Date());
   const [dateField, setDateField] = useState(null);
+  const [editingMode, setEditingMode] = useState(false);
+  const [updatingInventory, setUpdatingInventory] = useState(false);
 
   useEffect(() => {
-    const fetchInventory = async () => {
-      try {
-        console.log("Sending the request....");
-        const response = await fetch(`${BACKEND_URI}/inventory/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Response succesful");
-          setInventoryItems(data.inventory);
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInventory();
   }, []);
+
+  const fetchInventory = async () => {
+    try {
+      console.log("Sending the request....");
+      const response = await fetch(`${BACKEND_URI}/inventory/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Response succesful");
+        setInventoryItems(data.inventory);
+      } else {
+        throw new Error("Network response was not ok.");
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -63,7 +66,7 @@ export default function Inventory() {
     );
   }
 
-  const handleSavePress = async () => {
+  const handleSave = async () => {
     // Save the edited item to the backend
     try {
       const response = await fetch(
@@ -84,6 +87,7 @@ export default function Inventory() {
             item._id === updatedItem._id ? updatedItem : item
           )
         );
+        setEditingMode(false);
         setEditingItem(null); // Exit editing mode
       } else {
         throw new Error("Failed to update item.");
@@ -95,6 +99,7 @@ export default function Inventory() {
 
   const handleEditPress = (item) => {
     setEditingItem({ ...item });
+    setEditingMode(true);
   };
 
   const handleChange = (field, value) => {
@@ -102,6 +107,27 @@ export default function Inventory() {
       ...prevItem,
       [field]: value,
     }));
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `${BACKEND_URI}/inventory/${editingItem._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        fetchInventory();
+        console.log(response.json());
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
 
   const changeTime = (e, selectedDate) => {
@@ -120,6 +146,12 @@ export default function Inventory() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const handleRefresh = async () => {
+    setUpdatingInventory(true);
+    await fetchInventory();
+    setUpdatingInventory(false);
+  };
+
   const renderItem = ({ item }) => {
     const isEditing = editingItem && editingItem._id === item._id;
     return (
@@ -127,40 +159,43 @@ export default function Inventory() {
         {isEditing ? (
           <>
             <TextInput
-              style={[styles.cell, { width: 150, textAlign: "left" }]}
+              style={[styles.cellEdit, { width: 150 }]}
               value={editingItem.name}
               onChangeText={(text) => handleChange("name", text)}
             />
             <TextInput
-              style={[styles.cell, { width: 45 }]}
+              style={[styles.cellEdit, { width: 45 }]}
               value={String(editingItem.quantity)}
               onChangeText={(text) => handleChange("quantity", text)}
               keyboardType="numeric"
             />
             <Pressable
-              style={[styles.cell, { width: 110 }]}
+              style={[styles.cellEdit, { width: 110 }]}
               onPress={() => openDatePickerForField("dateAdded")}
             >
               <Text>{formatDate(editingItem.dateAdded)}</Text>
             </Pressable>
             <TextInput
-              style={[styles.cell, { width: 100 }]}
+              style={[styles.cellEdit, { width: 100 }]}
               value={editingItem.location}
               onChangeText={(text) => handleChange("location", text)}
             />
 
             <Pressable
-              style={[styles.cell, { width: 110 }]}
+              style={[styles.cellEdit, { width: 110 }]}
               onPress={() => openDatePickerForField("expirationDate")}
             >
               <Text>{formatDate(editingItem.expirationDate)}</Text>
             </Pressable>
-            <Pressable
-              style={styles.button}
-              title="Save"
-              onPress={handleSavePress}
-            >
+            <Pressable style={styles.button} title="Save" onPress={handleSave}>
               <Text style={styles.buttonText}>Save</Text>
+            </Pressable>
+            <Pressable
+              style={styles.buttonDelete}
+              title="Delete"
+              onPress={handleDelete}
+            >
+              <Text style={styles.buttonText}>Delete</Text>
             </Pressable>
           </>
         ) : (
@@ -190,7 +225,15 @@ export default function Inventory() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      horizontal={inventoryItems.length > 0}
+      refreshControl={
+        <RefreshControl
+          refreshing={updatingInventory}
+          onRefresh={handleRefresh}
+        />
+      }
+    >
       {inventoryItems.length > 0 ? (
         <>
           <ScrollView horizontal>
@@ -211,9 +254,20 @@ export default function Inventory() {
                 <Text style={[styles.headerText, { width: 110 }]}>
                   Expiration Date
                 </Text>
-                <Text style={[styles.headerText, { width: 50 }]}></Text>
+                <Text style={[styles.headerText, { width: 58 }]}></Text>
+
+                {editingMode ? (
+                  <>
+                    <Text style={[styles.headerText, { width: 62 }]}></Text>
+                  </>
+                ) : null}
               </View>
-              <FlatList data={inventoryItems} renderItem={renderItem} />
+              <FlatList
+                data={inventoryItems}
+                renderItem={renderItem}
+                refreshing={updatingInventory}
+                onRefresh={handleRefresh}
+              />
             </View>
           </ScrollView>
           {showDatePicker && (
@@ -233,6 +287,6 @@ export default function Inventory() {
           </View>
         </>
       )}
-    </View>
+    </ScrollView>
   );
 }
