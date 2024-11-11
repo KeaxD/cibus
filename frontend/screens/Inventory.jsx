@@ -262,12 +262,7 @@ export default function Inventory() {
                   </>
                 ) : null}
               </View>
-              <FlatList
-                data={inventoryItems}
-                renderItem={renderItem}
-                refreshing={updatingInventory}
-                onRefresh={handleRefresh}
-              />
+              <FlatList data={inventoryItems} renderItem={renderItem} />
             </View>
           </ScrollView>
           {showDatePicker && (
