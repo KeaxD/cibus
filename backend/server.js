@@ -27,7 +27,11 @@ mongoose
     //Products routes
     app.use("/products", routes.products);
 
+    //Inventory routes
     app.use("/inventory", routes.inventory);
+
+    //Recipes routes
+    app.use("/recipes", routes.recipes);
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
