@@ -21,9 +21,9 @@ router.get("/", async (req, res) => {
 // GET a Category Route
 router.get("/:category", async (req, res) => {
   try {
-    const { category } = req.params;
+    const categories = req.params.category.split(",");
     console.log("Querying the database...");
-    const inventory = await getProductsByCategory(category);
+    const inventory = await getProductsByCategory(categories);
     if (!inventory) {
       console.log("Couldn't query the database");
     }
@@ -78,10 +78,10 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-async function getProductsByCategory(category) {
+async function getProductsByCategory(query) {
   try {
     const inventoryItems = await Inventory.find({
-      categories: { $in: [category] },
+      categories: { $in: query },
     });
     return inventoryItems;
   } catch (error) {

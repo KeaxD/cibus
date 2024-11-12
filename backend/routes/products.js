@@ -97,7 +97,10 @@ async function saveProductDataInDatabase(response) {
 }
 
 function processCategoryString(categoriesString) {
-  return categoriesString.split(",").map((category) => category.trim());
+  if (categoriesString.length() > 0) {
+    return categoriesString.split(",").map((category) => category.trim());
+  }
+  return null;
 }
 
 async function addProductToInventory(product, quantity) {
@@ -110,12 +113,17 @@ async function addProductToInventory(product, quantity) {
       return inventoryItem;
     }
 
+    // Check if product.categories exists and is valid
+    const categories = product.categories
+      ? processCategoryString(product.categories)
+      : [];
+
     // Create a new inventory item
     const newInventoryItem = new Inventory({
       product: product._id,
       name: product.name,
       quantity,
-      categories: processCategoryString(product.categories),
+      categories: categories,
     });
 
     await newInventoryItem.save();

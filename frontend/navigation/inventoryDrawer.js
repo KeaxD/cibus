@@ -11,22 +11,29 @@ const InventoryDrawer = () => {
       <Drawer.Screen
         name="Snacks"
         component={Inventory}
-        initialParams={{ category: "Snacks" }}
+        initialParams={{
+          category: ["Snacks", "Chips and fries", "Sweet snacks", "Biscuits"],
+        }}
       />
       <Drawer.Screen
         name="Beverages"
         component={Inventory}
-        initialParams={{ category: "Beverages" }}
+        initialParams={{ category: ["Beverages"] }}
       />
       <Drawer.Screen
-        name="Meats and their products"
+        name="Meats"
         component={Inventory}
-        initialParams={{ category: "Meats and their products" }}
+        initialParams={{ category: ["Meats"] }}
       />
       <Drawer.Screen
         name="Dairies"
         component={Inventory}
-        initialParams={{ category: "Dairies" }}
+        initialParams={{ category: ["Dairies"] }}
+      />
+      <Drawer.Screen
+        name="Vegetables"
+        component={Inventory}
+        initialParams={{ category: ["Vegetables"] }}
       />
     </Drawer.Navigator>
   );
