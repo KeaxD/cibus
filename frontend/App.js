@@ -1,4 +1,4 @@
-import Navigation from "./navigation/navigation";
+import Navigation from "./navigation/bottomTabs";
 
 export default function App() {
   return <Navigation />;
