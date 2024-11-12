@@ -12,7 +12,7 @@ const InventoryDrawer = () => {
         name="Snacks"
         component={Inventory}
         initialParams={{
-          category: ["Snacks", "Chips and fries", "Sweet snacks", "Biscuits"],
+          category: ["Snacks", "Chips and fries"],
         }}
       />
       <Drawer.Screen
@@ -21,9 +21,14 @@ const InventoryDrawer = () => {
         initialParams={{ category: ["Beverages"] }}
       />
       <Drawer.Screen
+        name="Plant-based foods"
+        component={Inventory}
+        initialParams={{ category: ["Plant-based foods"] }}
+      />
+      <Drawer.Screen
         name="Meats"
         component={Inventory}
-        initialParams={{ category: ["Meats"] }}
+        initialParams={{ category: ["Meats and their products"] }}
       />
       <Drawer.Screen
         name="Dairies"
@@ -34,6 +39,21 @@ const InventoryDrawer = () => {
         name="Vegetables"
         component={Inventory}
         initialParams={{ category: ["Vegetables"] }}
+      />
+      <Drawer.Screen
+        name="Condiments"
+        component={Inventory}
+        initialParams={{ category: ["Condiments", "Syrups", "Sweeteners"] }}
+      />
+      <Drawer.Screen
+        name="Frozen foods"
+        component={Inventory}
+        initialParams={{ category: ["Frozen foods"] }}
+      />
+      <Drawer.Screen
+        name="Desserts"
+        component={Inventory}
+        initialParams={{ category: ["Desserts"] }}
       />
     </Drawer.Navigator>
   );
