@@ -7,7 +7,7 @@ import IconMCI from "react-native-vector-icons/MaterialCommunityIcons";
 import HomePage from "../screens/HomePage";
 import Camera from "../screens/CameraPage";
 import InventoryDrawer from "./inventoryDrawer";
-import RecipePage from "../screens/RecipePage";
+import RecipeStackScreen from "./recipeStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -54,8 +54,8 @@ function BottomTabGroup() {
         }}
       />
       <Tab.Screen
-        name="Recipes"
-        component={RecipePage}
+        name="RecipesStack"
+        component={RecipeStackScreen}
         options={{
           headerShown: false,
           tabBarLabel: "",

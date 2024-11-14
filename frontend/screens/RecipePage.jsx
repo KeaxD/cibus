@@ -1,32 +1,70 @@
-import { View, Text } from "react-native";
+import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import styles from "../styles/recipepage";
 
-import { SPOONACULAR_API_KEY } from "@env";
+import { BACKEND_URI } from "@env";
+import { useEffect, useState } from "react";
 
-export default function RecipePage() {
-  // Fetch recipes based on ingredients
-  const fetchRecipes = async (ingredients) => {
+export default function RecipePage({ navigation }) {
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, []);
+
+  const fetchRecipes = async () => {
     try {
-      const ingredientString = ingredients.join(","); // Convert ingredients array to comma-separated string
-      const response = await fetch(
-        `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientString}&apiKey=${SPOONACULAR_API_KEY}`
-      );
+      const response = await fetch(`${BACKEND_URI}/recipes/all`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       if (response.ok) {
-        const data = await response.json();
-        return data; // Return recipes data
+        const recipeData = await response.json();
+        setRecipes(recipeData);
+        setLoading(false);
       } else {
-        throw new Error("Failed to fetch recipes");
-        x;
+        console.log(
+          "There was a problem receiving recipes:",
+          response.statusText
+        );
+        setLoading(false);
       }
     } catch (error) {
-      console.error(error);
-      return [];
+      console.error("Error fetching recipes:", error);
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>Loading recipes...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView>
-      <Text>Recipe Page</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Recipe Page</Text>
+      <FlatList
+        data={recipes}
+        keyExtractor={(item) => item._id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.recipeCard}
+            onPress={() =>
+              navigation.navigate("RecipeDetails", { recipe: item })
+            }
+          >
+            <Image source={{ uri: item.image }} style={styles.recipeImage} />
+            <Text style={styles.recipeTitle}>{item.title}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 }

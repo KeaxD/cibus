@@ -14,4 +14,4 @@ GET http://localhost:3000/inventory/Snacks
 DELETE http://localhost:3000/inventory/672edb6a2aea1d00c27e319b
 
 ### 
-GET http://localhost:3000/recipes/
+GET http://localhost:3000/recipes/all
