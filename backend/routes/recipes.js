@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const router = express.Router();
 const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
+const numberOfRecipes = 10;
 
 router.get("/", (req, res) => {
   res.json({ message: "Welcome to the recipes section!" });
@@ -65,7 +66,7 @@ const fetchRecipesFromIngredients = async () => {
     const ingredientString = await fetchIngredientsFromInventory();
     console.log("Sending request to Spoonacular");
     const response = await fetch(
-      `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientString}&apiKey=${SPOONACULAR_API_KEY}`
+      `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientString}&number=${numberOfRecipes}&apiKey=${SPOONACULAR_API_KEY}`
     );
 
     if (response.ok) {
