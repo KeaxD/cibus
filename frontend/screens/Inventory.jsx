@@ -13,6 +13,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
 import { BACKEND_URI } from "@env";
 
+import CircleLoadingAnimation from "../components/circleLoading";
+
 export default function Inventory({ route }) {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,7 @@ export default function Inventory({ route }) {
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
+        <CircleLoadingAnimation />
       </View>
     );
   }

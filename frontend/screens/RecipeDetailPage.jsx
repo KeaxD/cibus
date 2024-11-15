@@ -30,10 +30,6 @@ const RecipeDetailPage = ({ route }) => {
     return ingredients.map((ingredient) => ingredient.name).join(", ");
   };
 
-  const testInstructions = {
-    html: recipe.instructions,
-  };
-
   const formattedInstructions = formatInstructions(recipe.instructions);
   const formattedUsedIngredients = formatIngredients(recipe.usedIngredients);
   const formattedMissedIngredients = formatIngredients(
