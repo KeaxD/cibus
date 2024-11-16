@@ -13,6 +13,7 @@ export default function CameraPage() {
   const [scanCooldown, setScanCooldown] = useState(false);
   const [productData, setProductData] = useState(null);
   const [selectedTab, setSelectedTab] = useState("add");
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -46,14 +47,14 @@ export default function CameraPage() {
 
     setTimeout(() => {
       setBarcodeScanned(false);
-    }, 1000); // Hide checkmark after 1 seconds
+    }, 1500); // Hide checkmark after 1 seconds
 
     //Request
     await sendBarcodeToBackend(data);
 
     setTimeout(() => {
       setScanCooldown(false);
-    }, 2000);
+    }, 2300);
   };
 
   function addLeadingZeroIfNeeded(barcode) {
@@ -88,7 +89,12 @@ export default function CameraPage() {
           setProductData(data);
           setTimeout(() => {
             setProductData(null);
-          }, 2500); // Clear product data after 2 seconds
+          }, 2000); // Clear product data after 2 seconds
+        } else {
+          setDeleteMessage(data.message);
+          setTimeout(() => {
+            setDeleteMessage("");
+          }, 2000); // Clear out delete message after 2 seconds
         }
         console.log("Server response successfully received");
       } else {
@@ -137,6 +143,11 @@ export default function CameraPage() {
           <Text style={styles.productBrand}>
             Current Quantity: {productData.inventory.quantity}
           </Text>
+        </View>
+      )}
+      {deleteMessage && (
+        <View style={styles.productInfo}>
+          <Text style={styles.productBrand}>{deleteMessage}</Text>
         </View>
       )}
     </View>

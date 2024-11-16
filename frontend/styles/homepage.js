@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   text: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
     color: "white",
   },
@@ -55,11 +55,11 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 10,
-    backgroundColor: "#f8f8f8",
+    paddingVertical: 10,
   },
   tab: {
     padding: 10,
+    marginHorizontal: 20,
   },
   selectedTab: {
     borderBottomWidth: 2,
