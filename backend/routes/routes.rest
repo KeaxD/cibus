@@ -14,4 +14,20 @@ GET http://localhost:3000/inventory/Snacks
 DELETE http://localhost:3000/inventory/672edb6a2aea1d00c27e319b
 
 ### 
-GET http://localhost:3000/recipes/all
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "name": "test",
+    "email":"test",
+    "password":"test"
+}
+
+### 
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email":"test",
+    "password":"test"
+}
