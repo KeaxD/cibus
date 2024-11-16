@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
+    "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-native-community/datetimepicker": "8.2.0",
+    "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/drawer": "^7.0.1",
     "@react-navigation/material-top-tabs": "^7.0.0",
@@ -21,6 +23,7 @@
     "cibus": "file:",
     "expo": "^52.0.7",
     "expo-camera": "^16.0.5",
+    "expo-secure-store": "^14.0.0",
     "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
