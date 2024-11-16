@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Easing } from "react-native";
 
 const CircleLoadingAnimation = () => {
   const animationValues = Array.from(
-    { length: 5 },
+    { length: 3 },
     () => new Animated.Value(0)
   );
 
@@ -35,40 +35,42 @@ const CircleLoadingAnimation = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {animationValues.map((animatedValue, index) => (
-        <Animated.View
-          key={index}
-          style={[
-            styles.circle,
-            {
-              left: index * 25,
-              transform: [
-                {
-                  translateY: animatedValue.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: [0, -50, 0],
-                  }),
-                },
-                {
-                  scale: animatedValue.interpolate({
-                    inputRange: [0, 0.5, 1],
-                    outputRange: [1, 0.3, 1],
-                  }),
-                },
-              ],
-              opacity: animatedValue.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: [1, 0.4, 1],
-              }),
-              backgroundColor: animatedValue.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: ["turquoise", "blue", "turquoise"],
-              }),
-            },
-          ]}
-        />
-      ))}
+    <View style={styles.loadingContainer}>
+      <View>
+        {animationValues.map((animatedValue, index) => (
+          <Animated.View
+            key={index}
+            style={[
+              styles.circle,
+              {
+                left: index * 25,
+                transform: [
+                  {
+                    translateY: animatedValue.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0, -50, 0],
+                    }),
+                  },
+                  {
+                    scale: animatedValue.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [1, 0.3, 1],
+                    }),
+                  },
+                ],
+                opacity: animatedValue.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: [1, 0.4, 1],
+                }),
+                backgroundColor: animatedValue.interpolate({
+                  inputRange: [0, 0.5, 1],
+                  outputRange: ["turquoise", "blue", "turquoise"],
+                }),
+              },
+            ]}
+          />
+        ))}
+      </View>
     </View>
   );
 };
@@ -76,9 +78,15 @@ const CircleLoadingAnimation = () => {
 const styles = StyleSheet.create({
   circle: {
     position: "absolute",
-    width: 20,
-    height: 20,
+    width: 13,
+    height: 13,
     borderRadius: 100,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    right: 33,
   },
 });
 

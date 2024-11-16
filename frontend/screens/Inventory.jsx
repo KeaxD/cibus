@@ -63,7 +63,6 @@ export default function Inventory({ route }) {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
         <CircleLoadingAnimation />
       </View>
     );

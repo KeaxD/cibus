@@ -4,6 +4,7 @@ import styles from "../styles/recipepage";
 
 import { BACKEND_URI } from "@env";
 import { useEffect, useState } from "react";
+import CircleLoadingAnimation from "../components/circleLoading";
 
 export default function RecipePage({ navigation }) {
   const [recipes, setRecipes] = useState([]);
@@ -42,7 +43,7 @@ export default function RecipePage({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Loading recipes...</Text>
+        <CircleLoadingAnimation />
       </SafeAreaView>
     );
   }

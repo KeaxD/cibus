@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 20,
   },
+
   listContainer: {
     flex: 1,
   },
