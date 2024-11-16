@@ -1,5 +1,6 @@
 const express = require("express");
 const Inventory = require("../models/inventory");
+const Product = require("../models/product");
 
 const router = express.Router();
 
@@ -74,6 +75,32 @@ router.delete("/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: `Server error, we couldn't delete item ${id}`,
+    });
+  }
+});
+
+// DELETE Route by barcode
+router.delete("/", async (req, res) => {
+  try {
+    const { barcode } = req.body;
+    const product = await Product.findOne({ barcode });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const result = await Inventory.findOneAndDelete({ product: product._id });
+
+    if (!result) {
+      return res.status(404).json({ message: "Inventory item not found" });
+    }
+
+    return res.status(200).json({
+      message: `Inventory item with barcode: ${barcode} was successfully deleted from your inventory`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: `Server error, we couldn't delete item with barcode: ${barcode}`,
     });
   }
 });

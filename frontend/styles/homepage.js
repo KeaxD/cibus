@@ -52,6 +52,23 @@ const styles = StyleSheet.create({
   productIngredients: {
     fontSize: 14,
   },
+  tabContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 10,
+    backgroundColor: "#f8f8f8",
+  },
+  tab: {
+    padding: 10,
+  },
+  selectedTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: "blue",
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default styles;

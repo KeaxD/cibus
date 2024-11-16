@@ -97,7 +97,7 @@ async function saveProductDataInDatabase(response) {
 }
 
 function processCategoryString(categoriesString) {
-  if (categoriesString.length() > 0) {
+  if (categoriesString.length > 0) {
     return categoriesString.split(",").map((category) => category.trim());
   }
   return null;

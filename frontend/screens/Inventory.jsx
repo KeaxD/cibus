@@ -36,7 +36,6 @@ export default function Inventory({ route }) {
   const fetchInventory = async () => {
     try {
       console.log("Sending the request....");
-      console.log(category);
       const response = await fetch(
         `${BACKEND_URI}/inventory/${category || ""}`,
         {
@@ -133,7 +132,6 @@ export default function Inventory({ route }) {
 
       if (response.ok) {
         fetchInventory();
-        console.log(response.json());
         setModalVisible(false);
       }
     } catch (error) {

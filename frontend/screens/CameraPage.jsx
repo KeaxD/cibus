@@ -12,6 +12,7 @@ export default function CameraPage() {
   const [barcodeScanned, setBarcodeScanned] = useState(false);
   const [scanCooldown, setScanCooldown] = useState(false);
   const [productData, setProductData] = useState(null);
+  const [selectedTab, setSelectedTab] = useState("add");
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -41,7 +42,6 @@ export default function CameraPage() {
 
     setScanCooldown(true); //Set the scanner on cooldown
 
-    console.log("Scanned data:", data);
     setBarcodeScanned(true); // Show checkmark when barcode is scanned
 
     setTimeout(() => {
@@ -68,8 +68,12 @@ export default function CameraPage() {
   const sendBarcodeToBackend = async (barcodeData) => {
     const formattedBarcode = addLeadingZeroIfNeeded(barcodeData);
     try {
-      const response = await fetch(`${BACKEND_URI}/products/add-product`, {
-        method: "POST",
+      const endpoint =
+        selectedTab === "add" ? "products/add-product" : "inventory";
+      const method = selectedTab === "add" ? "POST" : "DELETE";
+
+      const response = await fetch(`${BACKEND_URI}/${endpoint}`, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -77,9 +81,12 @@ export default function CameraPage() {
           barcode: formattedBarcode,
         }),
       });
+
       if (response.ok) {
         const data = await response.json(); // Parse the JSON response
-        setProductData(data);
+        if (selectedTab === "add") {
+          setProductData(data);
+        }
         console.log("Server response successfully received");
       } else {
         console.log(response, "Server Error");
@@ -105,6 +112,20 @@ export default function CameraPage() {
           </TouchableOpacity>
         </View>
       </CameraView>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, selectedTab === "add" && styles.selectedTab]}
+          onPress={() => setSelectedTab("add")}
+        >
+          <Text style={styles.tabText}>Add</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, selectedTab === "delete" && styles.selectedTab]}
+          onPress={() => setSelectedTab("delete")}
+        >
+          <Text style={styles.tabText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
       {productData && (
         <View style={styles.productInfo}>
           <Text style={styles.productName}>
