@@ -1,7 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const Recipe = require("../models/recipe");
-const Inventory = require("../models/inventory");
+const InventoryItem = require("../models/inventoryItem");
 require("dotenv").config();
 
 const router = express.Router();
@@ -115,7 +115,7 @@ const fetchIngredientsFromInventory = async () => {
   // Fetch inventory items from your backend
   try {
     console.log("Querying the database for Ingredients");
-    const inventoryResponse = await Inventory.find().populate("product");
+    const inventoryResponse = await InventoryItem.find().populate("product");
     const ingredients = inventoryResponse.map((item) => item.name);
     const ingredientString = ingredients.join(",");
     console.log("Ingredients found: ", ingredientString);

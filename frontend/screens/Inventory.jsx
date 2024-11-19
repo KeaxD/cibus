@@ -37,7 +37,7 @@ export default function Inventory({ route }) {
     try {
       console.log("Sending the request....");
       const response = await fetch(
-        `${BACKEND_URI}/inventory/${category || ""}`,
+        `${BACKEND_URI}/inventoryItem/${category || ""}`,
         {
           method: "GET",
           headers: {

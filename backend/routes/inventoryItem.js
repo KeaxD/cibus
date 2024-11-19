@@ -1,5 +1,5 @@
 const express = require("express");
-const Inventory = require("../models/inventory");
+const InventoryItem = require("../models/inventoryItem");
 const Product = require("../models/product");
 
 const router = express.Router();
@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     console.log("Querying the database...");
-    const inventory = await Inventory.find().populate("product");
+    const inventory = await InventoryItem.find().populate("product");
     if (!inventory) {
       console.log("Couldn't query the database");
     }
@@ -42,7 +42,7 @@ router.patch("/:id", async (req, res) => {
     const updatedItem = req.body;
 
     // Find the item by ID and update it with the new data
-    const result = await Inventory.findByIdAndUpdate(
+    const result = await InventoryItem.findByIdAndUpdate(
       id,
       { $set: updatedItem },
       { new: true }
@@ -63,7 +63,7 @@ router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await Inventory.findByIdAndDelete(id);
+    const result = await InventoryItem.findByIdAndDelete(id);
 
     if (!result) {
       return res.status(404).json({ message: "Inventory item not found" });
@@ -89,7 +89,9 @@ router.delete("/", async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const result = await Inventory.findOneAndDelete({ product: product._id });
+    const result = await InventoryItem.findOneAndDelete({
+      product: product._id,
+    });
 
     if (!result) {
       return res.status(404).json({ message: "Inventory item not found" });
@@ -107,7 +109,7 @@ router.delete("/", async (req, res) => {
 
 async function getProductsByCategory(query) {
   try {
-    const inventoryItems = await Inventory.find({
+    const inventoryItems = await InventoryItem.find({
       categories: { $in: query },
     });
     return inventoryItems;

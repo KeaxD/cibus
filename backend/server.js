@@ -5,7 +5,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const routes = require("./routes");
-const authRoutes = require("./routes/auth");
 
 const PORT = process.env.PORT || 3000;
 
@@ -29,13 +28,13 @@ mongoose
     app.use("/products", routes.products);
 
     //Inventory routes
-    app.use("/inventory", routes.inventory);
+    app.use("/inventoryItem", routes.inventoryItem);
 
     //Recipes routes
     app.use("/recipes", routes.recipes);
 
     //Authentication routes
-    app.use("/auth", authRoutes);
+    app.use("/auth", routes.auth);
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);

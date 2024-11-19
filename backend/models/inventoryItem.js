@@ -24,4 +24,4 @@ const inventorySchema = new mongoose.Schema({
   categories: { type: Array },
 });
 
-module.exports = mongoose.model("Inventory", inventorySchema);
+module.exports = mongoose.model("InventoryItem", inventorySchema);

@@ -1,7 +1,7 @@
 const express = require("express");
 const axios = require("axios");
 const Product = require("../models/product");
-const Inventory = require("../models/inventory");
+const InventoryItem = require("../models/inventoryItem");
 
 const router = express.Router();
 
@@ -106,7 +106,7 @@ function processCategoryString(categoriesString) {
 async function addProductToInventory(product, quantity) {
   try {
     // Find the inventory item by product ID if it's already in the inventory
-    let inventoryItem = await Inventory.findOne({ product: product._id });
+    let inventoryItem = await InventoryItem.findOne({ product: product._id });
     if (inventoryItem) {
       inventoryItem.quantity++;
       await inventoryItem.save();
@@ -119,7 +119,7 @@ async function addProductToInventory(product, quantity) {
       : [];
 
     // Create a new inventory item
-    const newInventoryItem = new Inventory({
+    const newInventoryItem = new InventoryItem({
       product: product._id,
       name: product.name,
       quantity,
