@@ -29,6 +29,8 @@ export default function Inventory({ route }) {
 
   let category = route.params?.category;
 
+  const endpoint = "inventoryItem";
+
   useEffect(() => {
     fetchInventory();
   }, [category]);
@@ -37,7 +39,7 @@ export default function Inventory({ route }) {
     try {
       console.log("Sending the request....");
       const response = await fetch(
-        `${BACKEND_URI}/inventoryItem/${category || ""}`,
+        `${BACKEND_URI}/${endpoint}/${category || ""}`,
         {
           method: "GET",
           headers: {
@@ -79,7 +81,7 @@ export default function Inventory({ route }) {
     // Save the edited item to the backend
     try {
       const response = await fetch(
-        `${BACKEND_URI}/inventory/${editingItem._id}`,
+        `${BACKEND_URI}/${endpoint}/${editingItem._id}`,
         {
           method: "PATCH",
           headers: {
@@ -121,7 +123,7 @@ export default function Inventory({ route }) {
   const handleDelete = async () => {
     try {
       const response = await fetch(
-        `${BACKEND_URI}/inventory/${editingItem._id}`,
+        `${BACKEND_URI}/${endpoint}/${editingItem._id}`,
         {
           method: "DELETE",
           headers: {
