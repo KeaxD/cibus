@@ -24,6 +24,11 @@ const styles = StyleSheet.create({
     margin: 10,
     color: "blue",
   },
+  errorText: {
+    textAlign: "center",
+    margin: 10,
+    color: "red",
+  },
 });
 
 export default styles;

@@ -13,7 +13,7 @@ const LoginScreen = () => {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isNewUser, setIsNewUser] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -31,7 +31,7 @@ const LoginScreen = () => {
         login(token);
       } else {
         console.error("Login failed");
-        setErrorMessage(response.json());
+        setErrorMessage("Login failed");
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -56,10 +56,12 @@ const LoginScreen = () => {
         console.log("Signup was successful");
         login(token);
       } else {
-        console.error("Signup failed");
+        const { error } = await response.json();
+        setErrorMessage(error);
       }
     } catch (error) {
       console.error("Error signing up:", error);
+      setErrorMessage("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +72,7 @@ const LoginScreen = () => {
     setEmail("");
     setPassword("");
     setName("");
+    setErrorMessage("");
   };
 
   return (
@@ -79,12 +82,9 @@ const LoginScreen = () => {
       ) : (
         <>
           <Text style={styles.title}>{isNewUser ? "Sign Up" : "Login"}</Text>
-          {setErrorMessage !==
-          (
-            <>
-              <Text>{errorMessage}</Text>
-            </>
-          )}
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
           {isNewUser && (
             <TextInput
               style={styles.input}
