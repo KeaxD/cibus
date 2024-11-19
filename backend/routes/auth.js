@@ -11,9 +11,13 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
   try {
-    const user = new User({ name, email, password });
-    await user.save();
-    res.status(201).send({ message: "User registered successfully" });
+    const newUser = new User({ name, email, password });
+    await newUser.save();
+    //Send the new user a token
+    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    res.status(201).send({ token });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }

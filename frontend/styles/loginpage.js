@@ -18,6 +18,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: "center",
   },
+  text: {
+    fontSize: 14,
+    textAlign: "center",
+    margin: 10,
+    color: "blue",
+  },
 });
 
 export default styles;

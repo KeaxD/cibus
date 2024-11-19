@@ -1,17 +1,25 @@
-import Navigation from "./navigation/bottomTabs";
-import LoginScreen from "./screens/LoginPage";
+import CircleLoadingAnimation from "./components/circleLoading";
+import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider, useAuth } from "./context/authContext";
+import AuthStackNavigator from "./navigation/authStack";
+import MainStackNavigator from "./navigation/mainStack";
 
-const AppContent = () => {
-  const { isLoggedIn } = useAuth();
+function RootNavigator() {
+  const { isLoading, isLoggedIn } = useAuth();
 
-  return isLoggedIn ? <Navigation /> : <LoginScreen />;
-};
+  if (isLoading) {
+    return <CircleLoadingAnimation />;
+  }
+
+  return isLoggedIn ? <MainStackNavigator /> : <AuthStackNavigator />;
+}
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
     </AuthProvider>
   );
 }

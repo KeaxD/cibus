@@ -5,13 +5,20 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check login status from secure storage
     const checkLoginStatus = async () => {
-      const token = await SecureStore.getItemAsync("token");
-      if (token) {
-        setIsLoggedIn(true);
+      try {
+        const token = await SecureStore.getItemAsync("token");
+        if (token) {
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error("Failed to get token from SecureStore", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     checkLoginStatus();
@@ -28,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

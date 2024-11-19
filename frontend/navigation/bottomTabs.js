@@ -1,4 +1,3 @@
-import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import IconFA6 from "react-native-vector-icons/FontAwesome6";
 import IconFA from "react-native-vector-icons/FontAwesome";
@@ -69,9 +68,5 @@ function BottomTabGroup() {
 }
 
 export default function Navigation() {
-  return (
-    <NavigationContainer>
-      <BottomTabGroup />
-    </NavigationContainer>
-  );
+  return <BottomTabGroup />;
 }
