@@ -8,12 +8,15 @@ import {
   TextInput,
   RefreshControl,
   Modal,
+  TouchableOpacity,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
 import { BACKEND_URI } from "@env";
+import * as SecureStore from "expo-secure-store";
 
 import CircleLoadingAnimation from "../components/circleLoading";
+import InventoryModal from "../components/inventoryNameModal";
 
 export default function Inventory({ route }) {
   const [inventoryItems, setInventoryItems] = useState([]);
@@ -26,10 +29,11 @@ export default function Inventory({ route }) {
   const [editingMode, setEditingMode] = useState(false);
   const [updatingInventory, setUpdatingInventory] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [inventoryName, setInventoryName] = useState("");
 
   let category = route.params?.category;
 
-  const endpoint = "inventoryItem";
+  const endpoint = "inventory";
 
   useEffect(() => {
     fetchInventory();
@@ -38,21 +42,59 @@ export default function Inventory({ route }) {
   const fetchInventory = async () => {
     try {
       console.log("Sending the request....");
+      const storedToken = await SecureStore.getItemAsync("token");
       const response = await fetch(
         `${BACKEND_URI}/${endpoint}/${category || ""}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${storedToken}`,
           },
         }
       );
       if (response.ok) {
         const data = await response.json();
         console.log("Response succesful");
-        setInventoryItems(data.inventory);
+        const inventoryItemArray = data.data;
+        console.log(inventoryItemArray);
+        console.log(inventoryItemArray.length);
+        setInventoryItems(inventoryItemArray);
+        console.log(inventoryItems);
       } else {
-        throw new Error("Network response was not ok.");
+        throw new Error("Network response was not daijoubu.");
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateInventory = async () => {
+    setLoading(true);
+    setModalVisible(false);
+    try {
+      console.log("Sending request to create Inventory");
+      const storedToken = await SecureStore.getItemAsync("token");
+      const response = await fetch(`${BACKEND_URI}/${endpoint}/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${storedToken}`,
+        },
+        body: JSON.stringify({ name: inventoryName }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Response succesful");
+        console.log(data);
+        if (data.data === null) {
+          setInventoryItems([]);
+        }
+        setInventoryItems(data.data);
+      } else {
+        throw new Error("Network response was not good.");
       }
     } catch (error) {
       setError(error.message);
@@ -247,15 +289,19 @@ export default function Inventory({ route }) {
         ) : (
           <>
             <Text style={[styles.cell, { width: 150, textAlign: "left" }]}>
-              {item.name}
+              {item.inventoryItem.name}
             </Text>
-            <Text style={[styles.cell, { width: 45 }]}> {item.quantity}</Text>
-            <Text style={[styles.cell, { width: 110 }]}>
-              {formatDate(item.dateAdded)}
+            <Text style={[styles.cell, { width: 45 }]}>
+              {item.inventoryItem.quantity}
             </Text>
-            <Text style={[styles.cell, { width: 100 }]}> {item.location}</Text>
             <Text style={[styles.cell, { width: 110 }]}>
-              {formatDate(item.expirationDate)}
+              {formatDate(item.inventoryItem.dateAdded)}
+            </Text>
+            <Text style={[styles.cell, { width: 100 }]}>
+              {item.inventoryItem.location}
+            </Text>
+            <Text style={[styles.cell, { width: 110 }]}>
+              {formatDate(item.inventoryItem.expirationDate)}
             </Text>
             <Pressable
               style={styles.button}
@@ -272,45 +318,65 @@ export default function Inventory({ route }) {
 
   return (
     <ScrollView
-      horizontal={inventoryItems.length > 0}
+      horizontal={true}
       refreshControl={
         <RefreshControl
           refreshing={updatingInventory}
           onRefresh={handleRefresh}
         />
       }
+      contentContainerStyle={styles.scrollContainer}
     >
-      {inventoryItems.length > 0 ? (
+      {inventoryItems == null ? (
+        <View style={[styles.centeredView]}>
+          <Text style={[{ fontSize: 16, margin: 10 }]}>
+            No inventory to display
+          </Text>
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            style={[styles.button, styles.buttonCircle]}
+          >
+            <Text style={styles.buttonText}>+</Text>
+          </TouchableOpacity>
+          <InventoryModal
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            inventoryName={inventoryName}
+            setInventoryName={setInventoryName}
+            handleCreateInventory={handleCreateInventory}
+          />
+        </View>
+      ) : inventoryItems.length === 0 ? (
+        <View style={styles.centeredView}>
+          <Text style={styles.headerText}>Inventory has no items</Text>
+        </View>
+      ) : (
         <>
-          <ScrollView horizontal>
-            <View style={styles.listContainer}>
-              <View style={styles.header}>
-                <Text
-                  style={[styles.headerText, { width: 150, textAlign: "left" }]}
-                >
-                  Name
-                </Text>
-                <Text style={[styles.headerText, { width: 45 }]}>Qty</Text>
-                <Text style={[styles.headerText, { width: 110 }]}>
-                  Date Added
-                </Text>
-                <Text style={[styles.headerText, { width: 100 }]}>
-                  Location
-                </Text>
-                <Text style={[styles.headerText, { width: 110 }]}>
-                  Expiration Date
-                </Text>
-                <Text style={[styles.headerText, { width: 54 }]}></Text>
+          <View style={styles.listContainer}>
+            <View style={styles.header}>
+              <Text
+                style={[styles.headerText, { width: 150, textAlign: "left" }]}
+              >
+                Name
+              </Text>
+              <Text style={[styles.headerText, { width: 45 }]}>Qty</Text>
+              <Text style={[styles.headerText, { width: 110 }]}>
+                Date Added
+              </Text>
+              <Text style={[styles.headerText, { width: 100 }]}>Location</Text>
+              <Text style={[styles.headerText, { width: 110 }]}>
+                Expiration Date
+              </Text>
+              <Text style={[styles.headerText, { width: 54 }]}></Text>
 
-                {editingMode ? (
-                  <>
-                    <Text style={[styles.headerText, { width: 54 }]}></Text>
-                  </>
-                ) : null}
-              </View>
-              <FlatList data={inventoryItems} renderItem={renderItem} />
+              {editingMode ? (
+                <>
+                  <Text style={[styles.headerText, { width: 54 }]}></Text>
+                </>
+              ) : null}
             </View>
-          </ScrollView>
+            <FlatList data={inventoryItems} renderItem={renderItem} />
+          </View>
           {showDatePicker && (
             <DateTimePicker
               value={date}
@@ -320,12 +386,6 @@ export default function Inventory({ route }) {
               onChange={changeTime}
             />
           )}
-        </>
-      ) : (
-        <>
-          <View style={[styles.listContainer, { alignItems: "center" }]}>
-            <Text>Nothing in your inventory</Text>
-          </View>
         </>
       )}
     </ScrollView>

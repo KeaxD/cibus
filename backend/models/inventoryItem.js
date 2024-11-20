@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const inventorySchema = new mongoose.Schema({
+const inventoryItemSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
@@ -24,4 +24,4 @@ const inventorySchema = new mongoose.Schema({
   categories: { type: Array },
 });
 
-module.exports = mongoose.model("InventoryItem", inventorySchema);
+module.exports = mongoose.model("InventoryItem", inventoryItemSchema);

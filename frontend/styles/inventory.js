@@ -1,12 +1,21 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexDirection: "column",
+    flexGrow: 1,
+    padding: 10,
+  },
   container: {
     flex: 1,
     paddingVertical: 30,
     paddingHorizontal: 20,
   },
-
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   listContainer: {
     flex: 1,
   },
@@ -49,8 +58,13 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: "blue",
     height: 40,
-    width: 54,
+    width: "auto",
     marginHorizontal: 8,
+  },
+  buttonCircle: {
+    borderRadius: 25,
+    width: 45,
+    height: 45,
   },
   buttonDelete: {
     backgroundColor: "red",
@@ -73,28 +87,6 @@ const styles = StyleSheet.create({
     elevation: 0.5,
     alignItems: "center",
     backgroundColor: "#f5f5f5",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalView: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 30,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalText: {
-    fontSize: 16,
   },
 });
 

@@ -1,16 +1,25 @@
 const express = require("express");
 const axios = require("axios");
 const Product = require("../models/product");
-const InventoryItem = require("../models/inventoryItem");
+const Inventory = require("../models/inventory");
 
 const router = express.Router();
+const auth = require("../middleware/auth");
+const User = require("../models/user");
 
 router.get("/", (req, res) => {
   res.json({ message: "Welcome to the products section!" });
 });
 
-router.post("/add-product", async (req, res) => {
+router.post("/add-product", auth, async (req, res) => {
   const { barcode } = req.body;
+
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+
+  const inventory = await Inventory.findById(user.mainInventory).populate(
+    "items.inventoryItem.product"
+  );
 
   try {
     let product = await checkDatabaseForProduct(barcode);
@@ -34,13 +43,13 @@ router.post("/add-product", async (req, res) => {
     }
 
     // Add the product to the inventory
-    const inventoryItem = await addProductToInventory(product, (quantity = 1));
+    const inventoryItem = await addProductToInventory(inventory, product);
 
     // Respond with the product and inventory details
     res.status(201).json({
       message: "Product added to inventory",
       product: productResponseJSON(product),
-      inventory: inventoryItem,
+      inventoryItem: inventoryItem,
     });
   } catch (error) {
     console.error("Error fetching product data:", error);
@@ -103,31 +112,36 @@ function processCategoryString(categoriesString) {
   return null;
 }
 
-async function addProductToInventory(product, quantity) {
+async function addProductToInventory(inventory, product) {
   try {
-    // Find the inventory item by product ID if it's already in the inventory
-    let inventoryItem = await InventoryItem.findOne({ product: product._id });
-    if (inventoryItem) {
-      inventoryItem.quantity++;
-      await inventoryItem.save();
-      return inventoryItem;
+    // Ensure that inventory.items is an array (initialize if not defined)
+    if (!Array.isArray(inventory.items)) {
+      inventory.items = [];
     }
+    const existingItem = await inventory.items.find(
+      (item) =>
+        item.inventoryItem.product._id.toString() === product._id.toString()
+    );
 
-    // Check if product.categories exists and is valid
-    const categories = product.categories
-      ? processCategoryString(product.categories)
-      : [];
-
-    // Create a new inventory item
-    const newInventoryItem = new InventoryItem({
-      product: product._id,
-      name: product.name,
-      quantity,
-      categories: categories,
-    });
-
-    await newInventoryItem.save();
-    return newInventoryItem;
+    if (existingItem) {
+      // If the product exists, increment the quantity
+      existingItem.inventoryItem.quantity += 1;
+      await inventory.save();
+      return existingItem; // Return the updated inventory item
+    } else {
+      // If the product doesn't exist, create a new inventory item
+      const newInventoryItem = {
+        inventoryItem: {
+          product: product._id,
+          name: product.name,
+          quantity: 1,
+          categories: processCategoryString(product.categories),
+        },
+      };
+      inventory.items.push(newInventoryItem);
+      await inventory.save(); // Save the updated inventory
+      return newInventoryItem; // Return the newly created inventory item
+    }
   } catch (error) {
     throw new Error("Error adding product to inventory: " + error.message);
   }

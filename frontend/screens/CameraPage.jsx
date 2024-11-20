@@ -1,6 +1,7 @@
 import { CameraView, useCameraPermissions, CameraType } from "expo-camera";
 import { useState } from "react";
 import { Button, Text, TouchableOpacity, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 import { BACKEND_URI } from "@env";
 
@@ -54,7 +55,7 @@ export default function CameraPage() {
 
     setTimeout(() => {
       setScanCooldown(false);
-    }, 2300);
+    }, 2800);
   };
 
   function addLeadingZeroIfNeeded(barcode) {
@@ -67,6 +68,7 @@ export default function CameraPage() {
   }
 
   const sendBarcodeToBackend = async (barcodeData) => {
+    const storedToken = await SecureStore.getItemAsync("token");
     const formattedBarcode = addLeadingZeroIfNeeded(barcodeData);
     try {
       const endpoint =
@@ -77,6 +79,7 @@ export default function CameraPage() {
         method: method,
         headers: {
           "Content-Type": "application/json",
+          Authorization: storedToken,
         },
         body: JSON.stringify({
           barcode: formattedBarcode,
@@ -86,15 +89,15 @@ export default function CameraPage() {
       if (response.ok) {
         const data = await response.json(); // Parse the JSON response
         if (selectedTab === "add") {
-          setProductData(data);
+          setProductData(data.inventoryItem.inventoryItem);
           setTimeout(() => {
             setProductData(null);
-          }, 2000); // Clear product data after 2 seconds
+          }, 2500); // Clear product data after 2 seconds
         } else {
           setDeleteMessage(data.message);
           setTimeout(() => {
             setDeleteMessage("");
-          }, 2000); // Clear out delete message after 2 seconds
+          }, 2500); // Clear out delete message after 2 seconds
         }
         console.log("Server response successfully received");
       } else {
@@ -137,11 +140,9 @@ export default function CameraPage() {
       </View>
       {productData && (
         <View style={styles.productInfo}>
-          <Text style={styles.productName}>
-            {productData.product.productName}
-          </Text>
+          <Text style={styles.productName}>{productData.name}</Text>
           <Text style={styles.productBrand}>
-            Current Quantity: {productData.inventory.quantity}
+            Current Quantity: {productData.quantity}
           </Text>
         </View>
       )}

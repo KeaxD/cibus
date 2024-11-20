@@ -30,6 +30,9 @@ mongoose
     //Inventory routes
     app.use("/inventoryItem", routes.inventoryItem);
 
+    //Inventory routes
+    app.use("/inventory", routes.inventory);
+
     //Recipes routes
     app.use("/recipes", routes.recipes);
 
