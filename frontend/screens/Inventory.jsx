@@ -55,12 +55,8 @@ export default function Inventory({ route }) {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log("Response succesful");
         const inventoryItemArray = data.data;
-        console.log(inventoryItemArray);
-        console.log(inventoryItemArray.length);
         setInventoryItems(inventoryItemArray);
-        console.log(inventoryItems);
       } else {
         throw new Error("Network response was not daijoubu.");
       }
@@ -70,6 +66,22 @@ export default function Inventory({ route }) {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <CircleLoadingAnimation />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text>Error: {error}</Text>
+      </View>
+    );
+  }
 
   const handleCreateInventory = async () => {
     setLoading(true);
@@ -103,54 +115,60 @@ export default function Inventory({ route }) {
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <CircleLoadingAnimation />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text>Error: {error}</Text>
-      </View>
-    );
-  }
-
   const handleSave = async () => {
+    if (!editingItem) return;
+
     // Save the edited item to the backend
     try {
+      setUpdatingInventory(true); // Show a loading indicator
+
+      const storedToken = await SecureStore.getItemAsync("token");
+
       const response = await fetch(
-        `${BACKEND_URI}/${endpoint}/${editingItem._id}`,
+        `${BACKEND_URI}/${endpoint}/update/${editingItem.inventoryItem._id}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${storedToken}`,
           },
-          body: JSON.stringify(editingItem),
+          body: JSON.stringify({
+            name: editingItem.inventoryItem.name,
+            quantity: editingItem.inventoryItem.quantity,
+            location: editingItem.inventoryItem.location,
+            expirationDate: editingItem.inventoryItem.expirationDate,
+          }),
         }
       );
 
       if (response.ok) {
-        const updatedItem = await response.json();
+        const { inventoryItem: updatedItem } = await response.json();
+
+        // Update the specific item in the inventoryItems array
         setInventoryItems((prevItems) =>
           prevItems.map((item) =>
-            item._id === updatedItem._id ? updatedItem : item
+            item.inventoryItem._id === updatedItem._id
+              ? { ...item, inventoryItem: updatedItem }
+              : item
           )
         );
+
         setEditingMode(false);
         setEditingItem(null); // Exit editing mode
       } else {
-        throw new Error("Failed to update item.");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update item.");
       }
     } catch (error) {
       console.error("Error updating item:", error);
+      setError(error.message);
+    } finally {
+      setUpdatingInventory(false); // Hide the loading indicator
     }
   };
 
   const handleEditPress = (item) => {
+    console.log("In edit press: ", item);
     setEditingItem({ ...item });
     setEditingMode(true);
   };
@@ -158,7 +176,10 @@ export default function Inventory({ route }) {
   const handleChange = (field, value) => {
     setEditingItem((prevItem) => ({
       ...prevItem,
-      [field]: value,
+      inventoryItem: {
+        ...prevItem.inventoryItem,
+        [field]: value,
+      },
     }));
   };
 
@@ -184,9 +205,11 @@ export default function Inventory({ route }) {
   };
 
   const changeTime = (e, selectedDate) => {
-    setDate(selectedDate);
-    setShowDatePicker(false);
-    handleChange(dateField, selectedDate);
+    if (selectedDate) {
+      setDate(selectedDate);
+      setShowDatePicker(false);
+      handleChange(dateField, selectedDate.toISOString());
+    }
   };
 
   const openDatePickerForField = (field) => {
@@ -213,24 +236,26 @@ export default function Inventory({ route }) {
           <>
             <TextInput
               style={[styles.cellEdit, { width: 150 }]}
-              value={editingItem.name}
+              value={editingItem.inventoryItem.name}
               onChangeText={(text) => handleChange("name", text)}
             />
             <TextInput
               style={[styles.cellEdit, { width: 45 }]}
-              value={String(editingItem.quantity)}
-              onChangeText={(text) => handleChange("quantity", text)}
+              value={String(editingItem.inventoryItem.quantity)}
+              onChangeText={(text) =>
+                handleChange("quantity", parseInt(text) || 0)
+              }
               keyboardType="numeric"
             />
             <Pressable
               style={[styles.cellEdit, { width: 110 }]}
               onPress={() => openDatePickerForField("dateAdded")}
             >
-              <Text>{formatDate(editingItem.dateAdded)}</Text>
+              <Text>{formatDate(editingItem.inventoryItem.dateAdded)}</Text>
             </Pressable>
             <TextInput
               style={[styles.cellEdit, { width: 100 }]}
-              value={editingItem.location}
+              value={editingItem.inventoryItem.location}
               onChangeText={(text) => handleChange("location", text)}
             />
 
@@ -238,7 +263,9 @@ export default function Inventory({ route }) {
               style={[styles.cellEdit, { width: 110 }]}
               onPress={() => openDatePickerForField("expirationDate")}
             >
-              <Text>{formatDate(editingItem.expirationDate)}</Text>
+              <Text>
+                {formatDate(editingItem.inventoryItem.expirationDate)}
+              </Text>
             </Pressable>
             <Pressable style={styles.button} title="Save" onPress={handleSave}>
               <Text style={styles.buttonText}>Save</Text>

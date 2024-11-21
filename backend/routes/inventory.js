@@ -74,4 +74,67 @@ router.post("/create", auth, async (req, res) => {
   }
 });
 
+router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
+  try {
+    const { name, quantity, location, expirationDate } = req.body;
+
+    // Ensure the user is authorized to update the item
+    const inventoryItem = req.inventoryItem;
+
+    // Update the fields if provided in the request body
+    if (name !== undefined) inventoryItem.name = name;
+    if (quantity !== undefined) inventoryItem.quantity = quantity;
+    if (location !== undefined) inventoryItem.location = location;
+    if (expirationDate !== undefined)
+      inventoryItem.expirationDate = new Date(expirationDate);
+
+    // Save the inventory Item
+    await inventoryItem.save();
+
+    res.status(200).json({
+      message: "Inventory item updated successfully",
+      inventoryItem,
+    });
+  } catch (error) {
+    console.error("Error updating inventory item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+async function getInventoryItem(req, res, next) {
+  try {
+    const userId = req.user._id;
+    const itemId = req.params.id;
+
+    // Fetch the user's main inventory
+    const inventory = await Inventory.findById(req.user.mainInventory).exec();
+
+    if (!inventory) {
+      return res.status(404).json({ message: "Inventory not found" });
+    }
+
+    // Ensure the user has permission to access this inventory
+    if (
+      String(inventory.owner) !== String(userId) &&
+      !inventory.collaborators.includes(userId)
+    ) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Find the specific inventory item
+    const item = inventory.items.id(itemId);
+
+    if (!item) {
+      return res.status(404).json({ message: "Inventory item not found" });
+    }
+
+    // Attach the item to the request object for downstream handlers
+    req.inventoryItem = item;
+    next();
+  } catch (error) {
+    console.error("Error in getInventoryItem middleware:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = router;
