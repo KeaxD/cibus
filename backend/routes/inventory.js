@@ -35,6 +35,8 @@ router.get("/", auth, async (req, res) => {
       });
     }
 
+    console.log("Main inventory: ", mainInventory);
+
     //Set the items to main Inventory items
     const inventoryItems = mainInventory.items;
 
@@ -88,7 +90,9 @@ router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
     // Update the fields if provided in the request body
     if (name !== undefined) inventoryItem.name = name;
     if (quantity !== undefined) inventoryItem.quantity = quantity;
+    console.log("Location before: ", inventoryItem.location);
     if (location !== undefined) inventoryItem.location = location;
+    console.log("Location after: ", inventoryItem.location);
     if (expirationDate !== undefined)
       inventoryItem.expirationDate = new Date(expirationDate);
 

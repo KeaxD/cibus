@@ -1,4 +1,11 @@
-import { StyleSheet } from "react-native";
+import {
+  StyleSheet,
+  Modal,
+  View,
+  TextInput,
+  Pressable,
+  Text,
+} from "react-native";
 
 const InventoryModal = ({
   modalVisible,

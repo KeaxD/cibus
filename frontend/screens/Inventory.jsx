@@ -133,10 +133,10 @@ export default function Inventory({ route }) {
             Authorization: `Bearer ${storedToken}`,
           },
           body: JSON.stringify({
-            name: editingItem.inventoryItem.name,
-            quantity: editingItem.inventoryItem.quantity,
-            location: editingItem.inventoryItem.location,
-            expirationDate: editingItem.inventoryItem.expirationDate,
+            name: editingItem.name,
+            quantity: editingItem.quantity,
+            location: editingItem.location,
+            expirationDate: editingItem.expirationDate,
           }),
         }
       );
@@ -147,9 +147,7 @@ export default function Inventory({ route }) {
         // Update the specific item in the inventoryItems array
         setInventoryItems((prevItems) =>
           prevItems.map((item) =>
-            item.inventoryItem._id === updatedItem._id
-              ? { ...item, inventoryItem: updatedItem }
-              : item
+            item._id === updatedItem._id ? { ...item, updatedItem } : item
           )
         );
 
@@ -168,7 +166,6 @@ export default function Inventory({ route }) {
   };
 
   const handleEditPress = (item) => {
-    console.log("In edit press: ", item);
     setEditingItem({ ...item });
     setEditingMode(true);
   };
@@ -176,10 +173,7 @@ export default function Inventory({ route }) {
   const handleChange = (field, value) => {
     setEditingItem((prevItem) => ({
       ...prevItem,
-      inventoryItem: {
-        ...prevItem.inventoryItem,
-        [field]: value,
-      },
+      [field]: value,
     }));
   };
 
@@ -236,12 +230,12 @@ export default function Inventory({ route }) {
           <>
             <TextInput
               style={[styles.cellEdit, { width: 150 }]}
-              value={editingItem.inventoryItem.name}
+              value={editingItem.name}
               onChangeText={(text) => handleChange("name", text)}
             />
             <TextInput
               style={[styles.cellEdit, { width: 45 }]}
-              value={String(editingItem.inventoryItem.quantity)}
+              value={String(editingItem.quantity)}
               onChangeText={(text) =>
                 handleChange("quantity", parseInt(text) || 0)
               }
@@ -251,11 +245,11 @@ export default function Inventory({ route }) {
               style={[styles.cellEdit, { width: 110 }]}
               onPress={() => openDatePickerForField("dateAdded")}
             >
-              <Text>{formatDate(editingItem.inventoryItem.dateAdded)}</Text>
+              <Text>{formatDate(editingItem.dateAdded)}</Text>
             </Pressable>
             <TextInput
               style={[styles.cellEdit, { width: 100 }]}
-              value={editingItem.inventoryItem.location}
+              value={editingItem.location}
               onChangeText={(text) => handleChange("location", text)}
             />
 
@@ -263,9 +257,7 @@ export default function Inventory({ route }) {
               style={[styles.cellEdit, { width: 110 }]}
               onPress={() => openDatePickerForField("expirationDate")}
             >
-              <Text>
-                {formatDate(editingItem.inventoryItem.expirationDate)}
-              </Text>
+              <Text>{formatDate(editingItem.expirationDate)}</Text>
             </Pressable>
             <Pressable style={styles.button} title="Save" onPress={handleSave}>
               <Text style={styles.buttonText}>Save</Text>
@@ -316,19 +308,15 @@ export default function Inventory({ route }) {
         ) : (
           <>
             <Text style={[styles.cell, { width: 150, textAlign: "left" }]}>
-              {item.inventoryItem.name}
+              {item.name}
             </Text>
-            <Text style={[styles.cell, { width: 45 }]}>
-              {item.inventoryItem.quantity}
-            </Text>
+            <Text style={[styles.cell, { width: 45 }]}>{item.quantity}</Text>
             <Text style={[styles.cell, { width: 110 }]}>
-              {formatDate(item.inventoryItem.dateAdded)}
+              {formatDate(item.dateAdded)}
             </Text>
-            <Text style={[styles.cell, { width: 100 }]}>
-              {item.inventoryItem.location}
-            </Text>
+            <Text style={[styles.cell, { width: 100 }]}>{item.location}</Text>
             <Text style={[styles.cell, { width: 110 }]}>
-              {formatDate(item.inventoryItem.expirationDate)}
+              {formatDate(item.expirationDate)}
             </Text>
             <Pressable
               style={styles.button}
