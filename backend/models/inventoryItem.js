@@ -9,7 +9,6 @@ const inventoryItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   quantity: {
     type: Number,
-    min: 1,
   },
   location: {
     type: String,
@@ -24,4 +23,4 @@ const inventoryItemSchema = new mongoose.Schema({
   categories: { type: Array },
 });
 
-module.exports = mongoose.model("InventoryItem", inventoryItemSchema);
+module.exports = inventoryItemSchema;

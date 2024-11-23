@@ -125,7 +125,7 @@ export default function Inventory({ route }) {
       const storedToken = await SecureStore.getItemAsync("token");
 
       const response = await fetch(
-        `${BACKEND_URI}/${endpoint}/update/${editingItem.inventoryItem._id}`,
+        `${BACKEND_URI}/${endpoint}/update/${editingItem._id}`,
         {
           method: "PATCH",
           headers: {

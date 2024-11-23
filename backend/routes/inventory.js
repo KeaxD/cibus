@@ -80,6 +80,10 @@ router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
 
     // Ensure the user is authorized to update the item
     const inventoryItem = req.inventoryItem;
+    const inventory = req.inventory;
+
+    console.log("Inventory Item : ", inventoryItem);
+    console.log("Inventory : ", inventory);
 
     // Update the fields if provided in the request body
     if (name !== undefined) inventoryItem.name = name;
@@ -88,8 +92,13 @@ router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
     if (expirationDate !== undefined)
       inventoryItem.expirationDate = new Date(expirationDate);
 
-    // Save the inventory Item
-    await inventoryItem.save();
+    // Mark the subdocument as modified
+    inventory.markModified("items");
+
+    // Save the parent Inventory document
+    await inventory.save();
+    console.log("Inventory saved: ", inventory);
+    console.log("Updated Inventory Item : ", inventoryItem);
 
     res.status(200).json({
       message: "Inventory item updated successfully",
@@ -121,6 +130,10 @@ async function getInventoryItem(req, res, next) {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    console.log("Item id requested: ", itemId);
+
+    console.log("Params: ", req.params);
+
     // Find the specific inventory item
     const item = inventory.items.id(itemId);
 
@@ -130,6 +143,7 @@ async function getInventoryItem(req, res, next) {
 
     // Attach the item to the request object for downstream handlers
     req.inventoryItem = item;
+    req.inventory = inventory;
     next();
   } catch (error) {
     console.error("Error in getInventoryItem middleware:", error);

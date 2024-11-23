@@ -18,7 +18,7 @@ router.post("/add-product", auth, async (req, res) => {
   const user = await User.findById(userId);
 
   const inventory = await Inventory.findById(user.mainInventory).populate(
-    "items.inventoryItem.product"
+    "items.product"
   );
 
   try {
@@ -118,30 +118,38 @@ async function addProductToInventory(inventory, product) {
     if (!Array.isArray(inventory.items)) {
       inventory.items = [];
     }
-    const existingItem = await inventory.items.find(
-      (item) =>
-        item.inventoryItem.product._id.toString() === product._id.toString()
-    );
+
+    const existingItem = inventory.items.find((item) => {
+      return item.product._id.toString() === product._id.toString();
+    });
 
     if (existingItem) {
       // If the product exists, increment the quantity
-      existingItem.inventoryItem.quantity += 1;
+      existingItem.quantity += 1;
+      console.log("UPDATED THE QUANTITY");
       await inventory.save();
       return existingItem; // Return the updated inventory item
     } else {
       // If the product doesn't exist, create a new inventory item
+      console.log("Creating a new inventory Item");
       const newInventoryItem = {
-        inventoryItem: {
-          product: product._id,
-          name: product.name,
-          quantity: 1,
-          categories: processCategoryString(product.categories),
-        },
+        product: product._id,
+        name: product.name,
+        quantity: 1,
+        categories: processCategoryString(product.categories),
       };
       inventory.items.push(newInventoryItem);
-      await inventory.save(); // Save the updated inventory
-      return newInventoryItem; // Return the newly created inventory item
     }
+
+    await inventory.save(); // Save the updated inventory
+
+    console.log(
+      existingItem ? existingItem : inventory.items[inventory.items.length - 1]
+    );
+
+    return existingItem
+      ? existingItem
+      : inventory.items[inventory.items.length - 1];
   } catch (error) {
     throw new Error("Error adding product to inventory: " + error.message);
   }

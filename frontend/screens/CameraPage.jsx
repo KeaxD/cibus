@@ -88,8 +88,9 @@ export default function CameraPage() {
 
       if (response.ok) {
         const data = await response.json(); // Parse the JSON response
+        console.log("DATA: ", data);
         if (selectedTab === "add") {
-          setProductData(data.inventoryItem.inventoryItem);
+          setProductData(data.inventoryItem);
           setTimeout(() => {
             setProductData(null);
           }, 2500); // Clear product data after 2 seconds
