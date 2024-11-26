@@ -178,13 +178,15 @@ export default function Inventory({ route }) {
   };
 
   const handleDelete = async () => {
+    const storedToken = await SecureStore.getItemAsync("token");
     try {
       const response = await fetch(
-        `${BACKEND_URI}/${endpoint}/${editingItem._id}`,
+        `${BACKEND_URI}/${endpoint}/delete/${editingItem._id}`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${storedToken}`,
           },
         }
       );

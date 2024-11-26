@@ -11,8 +11,10 @@ export const AuthProvider = ({ children }) => {
     // Check login status from secure storage
     const checkLoginStatus = async () => {
       try {
+        console.log("Checking for your token");
         const token = await SecureStore.getItemAsync("token");
         if (token) {
+          console.log("Token found, logging you in");
           setIsLoggedIn(true);
         }
       } catch (error) {

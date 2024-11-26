@@ -114,6 +114,26 @@ router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
   }
 });
 
+router.delete("/delete/:id", auth, getInventoryItem, async (req, res) => {
+  try {
+    // Ensure the user is authorized to update the item
+    const inventory = req.inventory;
+
+    // Use the pull method to remove the subdocument
+    inventory.items.pull(req.params.id);
+
+    // Save the parent Inventory document
+    await inventory.save();
+
+    res.status(200).json({
+      message: "Inventory item deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting inventory item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 async function getInventoryItem(req, res, next) {
   try {
     const userId = req.user._id;
