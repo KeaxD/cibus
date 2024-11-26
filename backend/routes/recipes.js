@@ -1,8 +1,10 @@
 const express = require("express");
 const axios = require("axios");
 const Recipe = require("../models/recipe");
+const User = require("../models/user");
 const InventoryItem = require("../models/inventoryItem");
 require("dotenv").config();
+const auth = require("../middleware/auth");
 
 const router = express.Router();
 const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY;
@@ -12,9 +14,11 @@ router.get("/", (req, res) => {
   res.json({ message: "Welcome to the recipes section!" });
 });
 
-router.get("/all", async (req, res) => {
+router.get("/all", auth, async (req, res) => {
   try {
-    const recipes = await fetchRecipesFromIngredients();
+    const user = req.user;
+    const userId = user._id;
+    const recipes = await fetchRecipesFromIngredients(userId);
 
     if (!recipes || recipes.length === 0) {
       return res.status(404).json({ message: "Could not find any recipes" });
@@ -61,9 +65,14 @@ async function saveRecipeDataInDatabase(recipeDataArray) {
   return savedRecipes;
 }
 
-const fetchRecipesFromIngredients = async () => {
+const fetchRecipesFromIngredients = async (userId) => {
   try {
-    const ingredientString = await fetchIngredientsFromInventory();
+    const ingredientString = await fetchIngredientsFromInventory(userId);
+
+    if (!ingredientString) {
+      return "No ingredients found";
+    }
+
     console.log("Sending request to Spoonacular");
     const response = await fetch(
       `https://api.spoonacular.com/recipes/findByIngredients?ingredients=${ingredientString}&number=${numberOfRecipes}&apiKey=${SPOONACULAR_API_KEY}`
@@ -111,13 +120,34 @@ const fetchRecipesFromIngredients = async () => {
   }
 };
 
-const fetchIngredientsFromInventory = async () => {
+const fetchIngredientsFromInventory = async (userId) => {
   // Fetch inventory items from your backend
   try {
-    console.log("Querying the database for Ingredients");
-    const inventoryResponse = await InventoryItem.find().populate("product");
-    const ingredients = inventoryResponse.map((item) => item.name);
+    console.log("USER ID: ", userId);
+    const user = await User.findById(userId).populate({
+      path: "mainInventory",
+      populate: {
+        path: "items",
+        populate: {
+          path: "product",
+        },
+      },
+    });
+
+    if (!user || !user.mainInventory) {
+      console.log("No main inventory found for the user.");
+      return "";
+    }
+
+    // Fetch inventory items from your backend, populating the 'product' field
+    const inventoryItems = user.mainInventory.items;
+
+    // Map through the inventory items to extract the name of each item
+    const ingredients = inventoryItems.map((item) => item.product.name);
+
+    // Join the ingredient names into a single string, separated by commas
     const ingredientString = ingredients.join(",");
+
     console.log("Ingredients found: ", ingredientString);
     return ingredientString;
   } catch (error) {

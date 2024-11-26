@@ -35,8 +35,6 @@ router.get("/", auth, async (req, res) => {
       });
     }
 
-    console.log("Main inventory: ", mainInventory);
-
     //Set the items to main Inventory items
     const inventoryItems = mainInventory.items;
 
@@ -76,6 +74,7 @@ router.post("/create", auth, async (req, res) => {
   }
 });
 
+//Patch an inventory Item
 router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
   try {
     const { name, quantity, location, expirationDate } = req.body;
@@ -114,6 +113,7 @@ router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
   }
 });
 
+//Delete an Inventory Item
 router.delete("/delete/:id", auth, getInventoryItem, async (req, res) => {
   try {
     // Ensure the user is authorized to update the item
@@ -134,6 +134,7 @@ router.delete("/delete/:id", auth, getInventoryItem, async (req, res) => {
   }
 });
 
+//Middleware to get Inventory and Inventory Item
 async function getInventoryItem(req, res, next) {
   try {
     const userId = req.user._id;

@@ -1,5 +1,6 @@
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as SecureStore from "expo-secure-store";
 import styles from "../styles/recipepage";
 
 import { BACKEND_URI } from "@env";
@@ -15,11 +16,13 @@ export default function RecipePage({ navigation }) {
   }, []);
 
   const fetchRecipes = async () => {
+    const storedToken = await SecureStore.getItemAsync("token");
     try {
       const response = await fetch(`${BACKEND_URI}/recipes/all`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: storedToken,
         },
       });
 
