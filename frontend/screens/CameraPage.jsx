@@ -72,14 +72,14 @@ export default function CameraPage() {
     const formattedBarcode = addLeadingZeroIfNeeded(barcodeData);
     try {
       const endpoint =
-        selectedTab === "add" ? "products/add-product" : "inventory";
+        selectedTab === "add" ? "products/add-product" : "inventory/delete";
       const method = selectedTab === "add" ? "POST" : "DELETE";
 
       const response = await fetch(`${BACKEND_URI}/${endpoint}`, {
         method: method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: storedToken,
+          Authorization: `Bearer ${storedToken}`,
         },
         body: JSON.stringify({
           barcode: formattedBarcode,

@@ -113,7 +113,7 @@ router.patch("/update/:id", auth, getInventoryItem, async (req, res) => {
   }
 });
 
-//Delete an Inventory Item
+//Delete an Inventory Item using the inventory page
 router.delete("/delete/:id", auth, getInventoryItem, async (req, res) => {
   try {
     // Ensure the user is authorized to update the item
@@ -124,6 +124,47 @@ router.delete("/delete/:id", auth, getInventoryItem, async (req, res) => {
 
     // Save the parent Inventory document
     await inventory.save();
+
+    res.status(200).json({
+      message: "Inventory item deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting inventory item:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Delete an Inventory Item by barcode
+router.delete("/delete", auth, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const barcode = req.body.barcode;
+
+    // Fetch the user's main inventory
+    const user = await User.findById(userId).populate({
+      path: "mainInventory",
+      populate: {
+        path: "items",
+        populate: {
+          path: "product",
+        },
+      },
+    });
+
+    const mainInventory = user.mainInventory;
+
+    // Check if the item exists in the inventory
+    const item = mainInventory.items.find(
+      (item) => item.product.barcode === barcode
+    );
+
+    if (!item) {
+      return res.status(404).json({ message: "Inventory item not found" });
+    }
+
+    // Remove the item from the inventory
+    mainInventory.items.pull(item._id);
+    await mainInventory.save();
 
     res.status(200).json({
       message: "Inventory item deleted successfully",
