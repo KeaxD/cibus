@@ -12,7 +12,7 @@ const InventoryDrawer = () => {
         name="Snacks"
         component={Inventory}
         initialParams={{
-          category: ["Snacks", "Chips and fries"],
+          category: ["Snacks", "Chips and fries", "Sweet snacks"],
         }}
       />
       <Drawer.Screen

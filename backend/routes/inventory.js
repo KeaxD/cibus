@@ -48,6 +48,57 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
+//Get all inventory items in a category
+router.get("/:categories", auth, async (req, res) => {
+  try {
+    const categoriesString = req.params.categories; //Get the string from the request params
+    categories = categoriesString.split(","); //Split it to turn it into an array of strings
+
+    const userId = req.user._id; //Get the user ID from the middleware
+
+    //Find the user
+    const user = await User.findById(userId).populate({
+      path: "mainInventory",
+      populate: {
+        path: "items",
+        populate: {
+          path: "product",
+        },
+      },
+    });
+
+    //Find the main inventory
+    const mainInventory = user.mainInventory;
+
+    //Check if the user has a Main inventory set
+    if (!mainInventory) {
+      console.log("User doesn't have a main inventory");
+      return res.json({
+        message: "No main inventory found.",
+        data: null,
+      });
+    }
+
+    const inventoryItems = mainInventory.items.filter((item) =>
+      categories.some((category) => item.product.categories.includes(category))
+    );
+
+    console.log(
+      "Inventory Items found for the categories: ",
+      categories,
+      inventoryItems
+    );
+
+    res.status(200).json({
+      result: "success",
+      message: "Items found",
+      data: inventoryItems,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Create a new inventory
 router.post("/create", auth, async (req, res) => {
   //Get the user's ID from the middleware
