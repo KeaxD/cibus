@@ -17,11 +17,11 @@ import * as SecureStore from "expo-secure-store";
 
 import CircleLoadingAnimation from "../components/circleLoading";
 import InventoryModal from "../components/inventoryNameModal";
+import AddUser from "../components/addUserModal";
 
 export default function Inventory({ route }) {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null); // State to handle editing
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -30,6 +30,8 @@ export default function Inventory({ route }) {
   const [updatingInventory, setUpdatingInventory] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [inventoryName, setInventoryName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   let category = route.params?.category;
 
@@ -58,10 +60,10 @@ export default function Inventory({ route }) {
         const inventoryItemArray = data.data;
         setInventoryItems(inventoryItemArray);
       } else {
-        throw new Error("Network response was not daijoubu.");
+        showMessage("Network response was not daijoubu.");
       }
     } catch (error) {
-      setError(error.message);
+      showMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -75,13 +77,44 @@ export default function Inventory({ route }) {
     );
   }
 
-  if (error) {
+  if (errorMessage !== "") {
     return (
-      <View style={styles.container}>
-        <Text>Error: {error}</Text>
+      <View style={[styles.absolute, { top: "50%", left: 0, width: "100%" }]}>
+        <Text style={styles.headerText}>{errorMessage}</Text>
       </View>
     );
   }
+
+  const handleAddUserToInventory = async () => {
+    setLoading(true);
+    setModalVisible(false);
+    try {
+      console.log("Sending the request");
+      const storedToken = await SecureStore.getItemAsync("token");
+      const response = await fetch(`${BACKEND_URI}/${endpoint}/share`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${storedToken}`,
+        },
+        body: JSON.stringify({ email: userEmail }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Response succesful");
+        console.log(data);
+        showMessage(data.message);
+      } else {
+        const error = await response.json();
+        console.log(error.message);
+        showMessage(error.message);
+      }
+    } catch (error) {
+      showMessage(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateInventory = async () => {
     setLoading(true);
@@ -106,13 +139,20 @@ export default function Inventory({ route }) {
         }
         setInventoryItems(data.data);
       } else {
-        throw new Error("Network response was not good.");
+        showMessage("Network response was not good.");
       }
     } catch (error) {
-      setError(error.message);
+      showMessage(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const showMessage = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 2000);
   };
 
   const handleSave = async () => {
@@ -155,11 +195,10 @@ export default function Inventory({ route }) {
         setEditingItem(null); // Exit editing mode
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update item.");
+        showMessage(errorData.message || "Failed to update item.");
       }
     } catch (error) {
-      console.error("Error updating item:", error);
-      setError(error.message);
+      showMessage(error.message);
     } finally {
       setUpdatingInventory(false); // Hide the loading indicator
     }
@@ -411,10 +450,20 @@ export default function Inventory({ route }) {
       </ScrollView>
 
       <View style={styles.absolute}>
-        <Pressable style={[styles.button, styles.buttonCircle]}>
+        <Pressable
+          style={[styles.button, styles.buttonCircle]}
+          onPress={() => setModalVisible(true)}
+        >
           <Text style={styles.buttonText}>+</Text>
         </Pressable>
       </View>
+      <AddUser
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        userEmail={userEmail}
+        setUserEmail={setUserEmail}
+        handleAddUserToInventory={handleAddUserToInventory}
+      />
     </>
   );
 }

@@ -226,6 +226,51 @@ router.delete("/delete", auth, async (req, res) => {
   }
 });
 
+router.post("/share", auth, async (req, res) => {
+  try {
+    //Finding the requested collaborator
+    const collaboratorEmail = req.body.email;
+    const collaborator = await User.findOne({ email: collaboratorEmail });
+
+    if (!collaborator) {
+      console.log("Collaborator not found");
+      return res.status(404).json({ message: "User could not be found" });
+    }
+
+    console.log("Collaborator found: ", collaborator);
+
+    //Getting the owner main inventory
+    const userId = req.user._id;
+    const user = await User.findById(userId).populate({
+      path: "mainInventory",
+      populate: {
+        path: "items",
+        populate: {
+          path: "product",
+        },
+      },
+    });
+    const mainInventory = user.mainInventory;
+
+    //Add the collaborator the the main inventory
+    mainInventory.collaborators.push(collaborator._id);
+
+    //Add the inventory to the collaborator's inventories
+    collaborator.inventories.push(mainInventory);
+
+    //Set it as the main inventory
+    collaborator.mainInventory = mainInventory._id;
+
+    //Save both element
+    await mainInventory.save();
+    await collaborator.save();
+    res.status(200).json({ message: "Collaborator added successfully" });
+  } catch (error) {
+    console.error("Error sharing inventory:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 //Middleware to get Inventory and Inventory Item
 async function getInventoryItem(req, res, next) {
   try {
