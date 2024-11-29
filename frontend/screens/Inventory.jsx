@@ -334,77 +334,87 @@ export default function Inventory({ route }) {
   };
 
   return (
-    <ScrollView
-      horizontal={true}
-      refreshControl={
-        <RefreshControl
-          refreshing={updatingInventory}
-          onRefresh={handleRefresh}
-        />
-      }
-      contentContainerStyle={styles.scrollContainer}
-    >
-      {inventoryItems == null ? (
-        <View style={[styles.centeredView]}>
-          <Text style={[{ fontSize: 16, margin: 10 }]}>
-            No inventory to display
-          </Text>
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={[styles.button, styles.buttonCircle]}
-          >
-            <Text style={styles.buttonText}>+</Text>
-          </TouchableOpacity>
-          <InventoryModal
-            modalVisible={modalVisible}
-            setModalVisible={setModalVisible}
-            inventoryName={inventoryName}
-            setInventoryName={setInventoryName}
-            handleCreateInventory={handleCreateInventory}
+    <>
+      <ScrollView
+        horizontal={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={updatingInventory}
+            onRefresh={handleRefresh}
           />
-        </View>
-      ) : inventoryItems.length === 0 ? (
-        <View style={styles.centeredView}>
-          <Text style={styles.headerText}>Inventory has no items</Text>
-        </View>
-      ) : (
-        <>
-          <View style={styles.listContainer}>
-            <View style={styles.header}>
-              <Text
-                style={[styles.headerText, { width: 150, textAlign: "left" }]}
-              >
-                Name
-              </Text>
-              <Text style={[styles.headerText, { width: 45 }]}>Qty</Text>
-              <Text style={[styles.headerText, { width: 110 }]}>
-                Date Added
-              </Text>
-              <Text style={[styles.headerText, { width: 100 }]}>Location</Text>
-              <Text style={[styles.headerText, { width: 110 }]}>
-                Expiration Date
-              </Text>
-              <Text style={[styles.headerText, { width: 54 }]}></Text>
-
-              {editingMode ? (
-                <>
-                  <Text style={[styles.headerText, { width: 54 }]}></Text>
-                </>
-              ) : null}
-            </View>
-            <FlatList data={inventoryItems} renderItem={renderItem} />
-          </View>
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              is24Hour={true}
-              display="default"
-              onChange={changeTime}
+        }
+        contentContainerStyle={styles.scrollContainer}
+      >
+        {inventoryItems == null ? (
+          <View style={[styles.centeredView]}>
+            <Text style={[{ fontSize: 16, margin: 10 }]}>
+              No inventory to display
+            </Text>
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              style={[styles.button, styles.buttonCircle]}
+            >
+              <Text style={styles.buttonText}>+</Text>
+            </TouchableOpacity>
+            <InventoryModal
+              modalVisible={modalVisible}
+              setModalVisible={setModalVisible}
+              inventoryName={inventoryName}
+              setInventoryName={setInventoryName}
+              handleCreateInventory={handleCreateInventory}
             />
-          )}
-        </>
-      )}
-    </ScrollView>
+          </View>
+        ) : inventoryItems.length === 0 ? (
+          <View style={styles.centeredView}>
+            <Text style={styles.headerText}>Inventory has no items</Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.listContainer}>
+              <View style={styles.header}>
+                <Text
+                  style={[styles.headerText, { width: 150, textAlign: "left" }]}
+                >
+                  Name
+                </Text>
+                <Text style={[styles.headerText, { width: 45 }]}>Qty</Text>
+                <Text style={[styles.headerText, { width: 110 }]}>
+                  Date Added
+                </Text>
+                <Text style={[styles.headerText, { width: 100 }]}>
+                  Location
+                </Text>
+                <Text style={[styles.headerText, { width: 110 }]}>
+                  Expiration Date
+                </Text>
+                <Text style={[styles.headerText, { width: 54 }]}></Text>
+
+                {editingMode ? (
+                  <>
+                    <Text style={[styles.headerText, { width: 54 }]}></Text>
+                  </>
+                ) : null}
+              </View>
+              <FlatList data={inventoryItems} renderItem={renderItem} />
+            </View>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                is24Hour={true}
+                display="default"
+                onChange={changeTime}
+              />
+            )}
+          </>
+        )}
+      </ScrollView>
+
+      <View style={styles.absolute}>
+        <Pressable style={[styles.button, styles.buttonCircle]}>
+          <Text style={styles.buttonText}>+</Text>
+        </Pressable>
+      </View>
+    </>
   );
 }

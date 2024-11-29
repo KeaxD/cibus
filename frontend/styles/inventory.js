@@ -111,6 +111,11 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
   },
+  absolute: {
+    position: "absolute",
+    top: "87%",
+    left: "80%",
+  },
 });
 
 export default styles;
