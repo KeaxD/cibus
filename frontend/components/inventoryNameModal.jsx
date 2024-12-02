@@ -75,4 +75,26 @@ const styles = StyleSheet.create({
     width: 200,
     backgroundColor: "#f5f5f5",
   },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 1,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: "blue",
+    height: 40,
+    width: "auto",
+    marginHorizontal: 8,
+  },
+  buttonText: {
+    fontSize: 14,
+    lineHeight: 21,
+    fontWeight: "bold",
+    letterSpacing: 0.25,
+    color: "white",
+  },
+  buttonDelete: {
+    backgroundColor: "red",
+  },
 });

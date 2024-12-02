@@ -3,10 +3,10 @@ import IconFA6 from "react-native-vector-icons/FontAwesome6";
 import IconFA from "react-native-vector-icons/FontAwesome";
 import IconMCI from "react-native-vector-icons/MaterialCommunityIcons";
 
-import HomePage from "../screens/HomePage";
 import Camera from "../screens/CameraPage";
 import InventoryDrawer from "./inventoryDrawer";
 import RecipeStackScreen from "./recipeStack";
+import HomeStack from "./homeStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +21,7 @@ function BottomTabGroup() {
     >
       <Tab.Screen
         name="Home"
-        component={HomePage}
+        component={HomeStack}
         options={{
           headerShown: false,
           tabBarLabel: "",

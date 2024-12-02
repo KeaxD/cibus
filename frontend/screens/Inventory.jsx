@@ -457,13 +457,15 @@ export default function Inventory({ route }) {
           <Text style={styles.buttonText}>+</Text>
         </Pressable>
       </View>
-      <AddUser
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        userEmail={userEmail}
-        setUserEmail={setUserEmail}
-        handleAddUserToInventory={handleAddUserToInventory}
-      />
+      {inventoryItems !== null && (
+        <AddUser
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          userEmail={userEmail}
+          setUserEmail={setUserEmail}
+          handleAddUserToInventory={handleAddUserToInventory}
+        />
+      )}
     </>
   );
 }

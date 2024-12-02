@@ -114,9 +114,9 @@ router.post("/create", auth, async (req, res) => {
   try {
     const newInventory = await inventory.save();
     console.log("Inventory Saved");
-    user.inventories.push(newInventory._id);
+    user.inventories.push({ inventory: newInventory._id, role: "owner" }); //Make sure that the user is the owner
     console.log("Inventory added to the user");
-    user.mainInventory = newInventory; //Make the new created inventory the user's main inventory
+    user.mainInventory = newInventory; //Make the newly created inventory the user's main inventory
     await user.save();
     console.log("User changes were saved");
     res.status(201).json(newInventory);
@@ -268,6 +268,33 @@ router.post("/share", auth, async (req, res) => {
   } catch (error) {
     console.error("Error sharing inventory:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+//Get all inventories of a user
+router.get("/user/inventories", auth, async (req, res) => {
+  try {
+    const userId = req.user._id; //Get the user ID from the middleware
+
+    //Find the user
+    const user = await User.findById(userId).populate({
+      path: "inventories",
+      populate: {
+        path: "inventory",
+      },
+    });
+
+    const inventories = user.inventories; // This should return all inventories
+
+    console.log("TEST Inventories found : ", inventories);
+
+    res.status(200).json({
+      result: "success",
+      message: "Items found",
+      data: inventories,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

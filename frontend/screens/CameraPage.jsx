@@ -5,7 +5,7 @@ import * as SecureStore from "expo-secure-store";
 
 import { BACKEND_URI } from "@env";
 
-import styles from "../styles/homepage";
+import styles from "../styles/camerapage";
 
 export default function CameraPage() {
   const [facing, setFacing] = useState(CameraType);

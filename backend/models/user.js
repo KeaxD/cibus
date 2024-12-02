@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Inventory",
       },
+      role: { type: String, enum: ["owner", "viewer"] },
     },
   ],
   mainInventory: { type: mongoose.Schema.Types.ObjectId, ref: "Inventory" },
