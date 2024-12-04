@@ -52,19 +52,21 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 1,
-    paddingHorizontal: 8,
+    padding: 8,
     borderRadius: 4,
     elevation: 3,
     backgroundColor: "blue",
     height: 40,
     width: "auto",
-    marginHorizontal: 8,
+    margin: 2,
   },
   buttonCircle: {
-    borderRadius: 25,
-    width: 45,
-    height: 45,
+    width: 50,
+    height: 50,
+    margin: 8,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonDelete: {
     backgroundColor: "red",
@@ -111,9 +113,9 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
   },
-  absolute: {
+  bubbleContainer: {
     position: "absolute",
-    top: "87%",
+    top: "80%",
     left: "80%",
   },
 });

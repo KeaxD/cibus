@@ -10,12 +10,12 @@ import {
 
 import styles from "../styles/modal";
 
-const AddUserModal = ({
+const CreateInventoryModal = ({
   modalVisible,
   setModalVisible,
-  userEmail,
-  setUserEmail,
-  handleAddUserToInventory,
+  inventoryName,
+  setInventoryName,
+  handleCreateInventory,
 }) => {
   return (
     <View>
@@ -29,12 +29,12 @@ const AddUserModal = ({
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Add User to Inventory</Text>
+            <Text style={styles.modalText}>Create New Inventory</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter user's email"
-              value={userEmail}
-              onChangeText={setUserEmail}
+              placeholder="Enter inventory name"
+              value={inventoryName}
+              onChangeText={setInventoryName}
             />
             <View style={styles.buttonContainer}>
               <Pressable
@@ -45,9 +45,9 @@ const AddUserModal = ({
               </Pressable>
               <Pressable
                 style={[styles.button, styles.buttonOpen]}
-                onPress={handleAddUserToInventory}
+                onPress={handleCreateInventory}
               >
-                <Text style={styles.textStyle}>Add</Text>
+                <Text style={styles.textStyle}>Create</Text>
               </Pressable>
             </View>
           </View>
@@ -57,4 +57,4 @@ const AddUserModal = ({
   );
 };
 
-export default AddUserModal;
+export default CreateInventoryModal;

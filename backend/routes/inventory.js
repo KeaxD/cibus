@@ -256,7 +256,10 @@ router.post("/share", auth, async (req, res) => {
     mainInventory.collaborators.push(collaborator._id);
 
     //Add the inventory to the collaborator's inventories
-    collaborator.inventories.push(mainInventory);
+    collaborator.inventories.push({
+      inventory: mainInventory._id,
+      role: "viewer",
+    });
 
     //Set it as the main inventory
     collaborator.mainInventory = mainInventory._id;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -14,10 +14,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../styles/inventory";
 import { BACKEND_URI } from "@env";
 import * as SecureStore from "expo-secure-store";
+import IconMCI from "react-native-vector-icons/MaterialCommunityIcons";
 
 import CircleLoadingAnimation from "../components/circleLoading";
-import InventoryModal from "../components/inventoryNameModal";
-import AddUser from "../components/addUserModal";
+import BubbleButtons from "../components/bubbleOptions";
+import CreateInventoryModal from "../components/createInventoryModal";
+import AddUserModal from "../components/addUserModal";
+import DeleteInventoryItemModal from "../components/deleteInventoryItemModal";
 
 export default function Inventory({ route }) {
   const [inventoryItems, setInventoryItems] = useState([]);
@@ -28,10 +31,15 @@ export default function Inventory({ route }) {
   const [dateField, setDateField] = useState(null);
   const [editingMode, setEditingMode] = useState(false);
   const [updatingInventory, setUpdatingInventory] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState({
+    addUser: false,
+    createInventory: false,
+    deleteInventoryItem: false,
+  });
   const [inventoryName, setInventoryName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
   let category = route.params?.category;
 
@@ -40,6 +48,10 @@ export default function Inventory({ route }) {
   useEffect(() => {
     fetchInventory();
   }, [category]);
+
+  useEffect(() => {
+    console.log("Modal visibility state", modalVisible.addUser);
+  }, [modalVisible]);
 
   const fetchInventory = async () => {
     try {
@@ -79,7 +91,9 @@ export default function Inventory({ route }) {
 
   if (errorMessage !== "") {
     return (
-      <View style={[styles.absolute, { top: "50%", left: 0, width: "100%" }]}>
+      <View
+        style={[styles.centeredView, { top: "50%", left: 0, width: "100%" }]}
+      >
         <Text style={styles.headerText}>{errorMessage}</Text>
       </View>
     );
@@ -87,7 +101,7 @@ export default function Inventory({ route }) {
 
   const handleAddUserToInventory = async () => {
     setLoading(true);
-    setModalVisible(false);
+    setModalVisible({ ...modalVisible, addUser: false });
     try {
       console.log("Sending the request");
       const storedToken = await SecureStore.getItemAsync("token");
@@ -118,7 +132,7 @@ export default function Inventory({ route }) {
 
   const handleCreateInventory = async () => {
     setLoading(true);
-    setModalVisible(false);
+    setModalVisible({ ...modalVisible, createInventory: false });
     try {
       console.log("Sending request to create Inventory");
       const storedToken = await SecureStore.getItemAsync("token");
@@ -217,6 +231,8 @@ export default function Inventory({ route }) {
   };
 
   const handleDelete = async () => {
+    setLoading(true);
+    setModalVisible({ ...modalVisible, deleteInventoryItem: false });
     const storedToken = await SecureStore.getItemAsync("token");
     try {
       const response = await fetch(
@@ -232,7 +248,6 @@ export default function Inventory({ route }) {
 
       if (response.ok) {
         fetchInventory();
-        setModalVisible(false);
       }
     } catch (error) {
       console.error("Error deleting item:", error);
@@ -306,45 +321,27 @@ export default function Inventory({ route }) {
             <Pressable
               style={[styles.button, styles.buttonDelete]}
               title="Delete"
-              onPress={() => setModalVisible(true)}
+              onPress={() =>
+                setModalVisible({
+                  ...modalVisible,
+                  deleteInventoryItem: true,
+                })
+              }
             >
               <Text style={styles.buttonText}>Delete</Text>
             </Pressable>
 
-            {modalVisible && (
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                  setModalVisible(false);
-                }}
-              >
-                <View style={styles.centeredView}>
-                  <View style={styles.modalView}>
-                    <Text style={styles.modalText}>
-                      Are you sure you want to delete {item.name}?
-                    </Text>
-                    <View
-                      style={[{ flexDirection: "row", paddingVertical: 10 }]}
-                    >
-                      <Pressable
-                        style={[styles.button]}
-                        onPress={() => setModalVisible(false)}
-                      >
-                        <Text style={styles.buttonText}>No</Text>
-                      </Pressable>
-                      <Pressable
-                        style={[styles.button, styles.buttonDelete]}
-                        onPress={() => setModalVisible(handleDelete)}
-                      >
-                        <Text style={styles.buttonText}>Yes</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </View>
-              </Modal>
-            )}
+            <DeleteInventoryItemModal
+              modalVisible={modalVisible.deleteInventoryItem}
+              setModalVisible={(visible) =>
+                setModalVisible({
+                  ...modalVisible,
+                  deleteInventoryItem: visible,
+                })
+              }
+              item={item}
+              handleDelete={handleDelete}
+            />
           </>
         ) : (
           <>
@@ -372,6 +369,10 @@ export default function Inventory({ route }) {
     );
   };
 
+  const toggleExpanded = () => {
+    setExpanded((prev) => !prev);
+  };
+
   return (
     <>
       <ScrollView
@@ -395,13 +396,6 @@ export default function Inventory({ route }) {
             >
               <Text style={styles.buttonText}>+</Text>
             </TouchableOpacity>
-            <InventoryModal
-              modalVisible={modalVisible}
-              setModalVisible={setModalVisible}
-              inventoryName={inventoryName}
-              setInventoryName={setInventoryName}
-              handleCreateInventory={handleCreateInventory}
-            />
           </View>
         ) : inventoryItems.length === 0 ? (
           <View style={styles.centeredView}>
@@ -449,23 +443,55 @@ export default function Inventory({ route }) {
         )}
       </ScrollView>
 
-      <View style={styles.absolute}>
-        <Pressable
-          style={[styles.button, styles.buttonCircle]}
-          onPress={() => setModalVisible(true)}
+      <View style={styles.bubbleContainer}>
+        <BubbleButtons
+          index={2}
+          expanded={expanded}
+          onPress={() =>
+            setModalVisible((prevState) => ({
+              ...prevState,
+              addUser: true,
+            }))
+          }
         >
-          <Text style={styles.buttonText}>+</Text>
-        </Pressable>
+          <IconMCI name="account-plus" size={25} color="#f4f4f4" />
+        </BubbleButtons>
+        <BubbleButtons
+          index={1}
+          expanded={expanded}
+          onPress={() =>
+            setModalVisible((prevState) => ({
+              ...prevState,
+              createInventory: true,
+            }))
+          }
+        >
+          <IconMCI name="fridge" size={25} color="#f4f4f4" />
+        </BubbleButtons>
+        <BubbleButtons index={0} isMainButton onPress={toggleExpanded}>
+          <IconMCI name="plus" size={25} color="#f4f4f4" />
+        </BubbleButtons>
       </View>
-      {inventoryItems !== null && (
-        <AddUser
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          userEmail={userEmail}
-          setUserEmail={setUserEmail}
-          handleAddUserToInventory={handleAddUserToInventory}
-        />
-      )}
+
+      <AddUserModal
+        modalVisible={modalVisible.addUser}
+        setModalVisible={(visible) =>
+          setModalVisible({ ...modalVisible, addUser: visible })
+        }
+        userEmail={userEmail}
+        setUserEmail={setUserEmail}
+        handleAddUserToInventory={handleAddUserToInventory}
+      />
+
+      <CreateInventoryModal
+        modalVisible={modalVisible.createInventory}
+        setModalVisible={(visible) =>
+          setModalVisible({ ...modalVisible, createInventory: visible })
+        }
+        inventoryName={inventoryName}
+        setInventoryName={setInventoryName}
+        handleCreateInventory={handleCreateInventory}
+      />
     </>
   );
 }

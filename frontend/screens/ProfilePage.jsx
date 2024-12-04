@@ -54,7 +54,7 @@ export default function ProfilePage() {
       if (response.ok) {
         const data = await response.json();
         setInventories(data.data);
-        console.log(data.data[0].inventory.name);
+        console.log(data.data);
       } else {
         setErrorMessage("There was an error while handling the response");
       }
