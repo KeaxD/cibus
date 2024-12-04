@@ -12,8 +12,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     margin: 8,
   },
-  mainListContainer: {
-    padding: 16,
+  inventoriesContainer: {
+    paddingVertical: 16,
   },
   heading: {
     fontSize: 16,
@@ -21,8 +21,9 @@ const styles = StyleSheet.create({
   },
   inventoryCard: {
     backgroundColor: "#fff",
-    padding: 16,
+    padding: 12,
     margin: 5,
+    opacity: 0.5,
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: {
@@ -41,6 +42,12 @@ const styles = StyleSheet.create({
   inventoryCardAttributes: {
     fontSize: 14,
     margin: 1,
+  },
+  inventoriesListContainer: {
+    flexDirection: "row",
+  },
+  mainInventoryCard: {
+    opacity: 1,
   },
 });
 

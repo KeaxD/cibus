@@ -24,7 +24,6 @@ const BubbleButtons = ({
 
   const handlePress = useCallback(() => {
     onPress();
-    console.log("Button pressed");
   }, [onPress]);
 
   useEffect(() => {

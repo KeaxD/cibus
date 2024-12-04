@@ -116,7 +116,7 @@ router.post("/create", auth, async (req, res) => {
     console.log("Inventory Saved");
     user.inventories.push({ inventory: newInventory._id, role: "owner" }); //Make sure that the user is the owner
     console.log("Inventory added to the user");
-    user.mainInventory = newInventory; //Make the newly created inventory the user's main inventory
+    user.mainInventory = newInventory._id; //Make the newly created inventory the user's main inventory
     await user.save();
     console.log("User changes were saved");
     res.status(201).json(newInventory);
@@ -287,17 +287,65 @@ router.get("/user/inventories", auth, async (req, res) => {
       },
     });
 
-    const inventories = user.inventories; // This should return all inventories
+    const inventories = user.inventories;
+    const mainInventory = user.mainInventory;
 
     console.log("TEST Inventories found : ", inventories);
+    console.log("Main inventory: ", mainInventory);
 
     res.status(200).json({
       result: "success",
       message: "Items found",
       data: inventories,
+      mainInventory: mainInventory,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+//Make the requested inventory the user's main inventory
+router.post("/user/mainInventory", auth, async (req, res) => {
+  try {
+    //Get the inventory Id from the request body and the userID from the middleware
+    const inventoryId = req.body.inventory_id;
+    const userId = req.user._id;
+
+    console.log("Inventory ID received: ", inventoryId);
+    console.log("User ID received: ", userId);
+
+    //get the user
+    const user = await User.findById(userId).exec();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    //Check if the new Main Inventory is not the current one
+    if (user.mainInventory._id.toString() === inventoryId) {
+      return res
+        .status(200)
+        .json({ message: "This is already your main Inventory" });
+    }
+
+    //get the new main inventory
+    const newMainInventory = await Inventory.findById(inventoryId);
+
+    if (!newMainInventory) {
+      return res.status(404).json({ message: "Inventory could not be found" });
+    }
+
+    console.log("New Main Inventory found: ", newMainInventory);
+
+    //set the user's main inventory to the requested inventory
+    user.mainInventory = newMainInventory._id;
+    user.save();
+
+    res.status(200).json({
+      result: "success",
+      message: "Main inventory successfuly changed",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
