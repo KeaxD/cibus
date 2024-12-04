@@ -185,7 +185,7 @@ router.delete("/delete/:id", auth, getInventoryItem, async (req, res) => {
   }
 });
 
-// Delete an Inventory Item by barcode
+// Substract the quantity of an Inventory Item by barcode
 router.delete("/delete", auth, async (req, res) => {
   try {
     const userId = req.user._id;
@@ -210,15 +210,25 @@ router.delete("/delete", auth, async (req, res) => {
     );
 
     if (!item) {
-      return res.status(404).json({ message: "Inventory item not found" });
+      return res
+        .status(404)
+        .json({ message: "Inventory item not found in your inventory" });
     }
 
-    // Remove the item from the inventory
-    mainInventory.items.pull(item._id);
-    await mainInventory.save();
+    // Substract one from the quantity
+    item.quantity--;
+
+    // If the quantity reaches 0, remove the item completely from the inventory
+    if (item.quantity === 0) {
+      // Use the `pull` method to remove the item from the inventory's items array
+      mainInventory.items.pull(item._id);
+    }
+
+    //Save the changes
+    mainInventory.save();
 
     res.status(200).json({
-      message: "Inventory item deleted successfully",
+      message: `Item quantity successfully updated ${item.quantity}`,
     });
   } catch (error) {
     console.error("Error deleting inventory item:", error);
@@ -289,9 +299,6 @@ router.get("/user/inventories", auth, async (req, res) => {
 
     const inventories = user.inventories;
     const mainInventory = user.mainInventory;
-
-    console.log("TEST Inventories found : ", inventories);
-    console.log("Main inventory: ", mainInventory);
 
     res.status(200).json({
       result: "success",
