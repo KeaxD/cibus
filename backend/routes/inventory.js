@@ -356,6 +356,62 @@ router.post("/user/mainInventory", auth, async (req, res) => {
   }
 });
 
+router.get("/grocery/grocery-list", auth, async (req, res) => {
+  try {
+    console.log("Got a request for Grocery list");
+    const userId = req.user._id;
+
+    //get the user
+    const user = await User.findById(userId).populate("mainInventory").exec();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const mainInventory = user.mainInventory;
+
+    console.log("Trying to get the grocery List");
+    const groceryList = mainInventory.groceryList;
+    console.log("Grocery list: ", groceryList);
+
+    res.status(200).json({
+      message: "Successfully retrieved the grocery list",
+      data: groceryList,
+    });
+  } catch (error) {
+    res.status(200).json({ message: "Internal server error" });
+  }
+});
+
+router.patch("/grocery/grocery-list/update", auth, async (req, res) => {
+  try {
+    console.log("Got a request for Grocery list update");
+
+    const userId = req.user._id;
+    const { updatedGroceryList } = req.body;
+
+    //get the user
+    const user = await User.findById(userId).populate("mainInventory");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const mainInventory = user.mainInventory;
+
+    console.log("Updating  the grocery List");
+
+    mainInventory.groceryList = updatedGroceryList.split("\n");
+    await mainInventory.save();
+
+    res.status(200).json({
+      message: "Grocery List successfully updated",
+      data: mainInventory.groceryList.join("\n"),
+    });
+  } catch (error) {
+    console.error("Error updating grocery list:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 //Middleware to get Inventory and Inventory Item
 async function getInventoryItem(req, res, next) {
   try {

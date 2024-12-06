@@ -18,6 +18,7 @@ const inventorySchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  groceryList: { type: [String], default: [] },
 });
 
 module.exports = mongoose.model("Inventory", inventorySchema);

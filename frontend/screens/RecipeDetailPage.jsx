@@ -29,23 +29,32 @@ const RecipeDetailPage = ({ route }) => {
   const formatIngredients = (ingredients) => {
     return ingredients.map((ingredient) => ingredient.name).join(", ");
   };
+  // Check for ingredients and format them
+  const getFormattedIngredients = (recipe) => {
+    const formattedIngredients = {
+      usedIngredients: recipe.usedIngredients
+        ? formatIngredients(recipe.usedIngredients)
+        : "No used ingredients",
+      missedIngredients: recipe.missedIngredients
+        ? formatIngredients(recipe.missedIngredients)
+        : "No missed ingredients",
+    };
+    return formattedIngredients;
+  };
+
+  const { usedIngredients, missedIngredients } =
+    getFormattedIngredients(recipe);
 
   const formattedInstructions = formatInstructions(recipe.instructions);
-  const formattedUsedIngredients = formatIngredients(recipe.usedIngredients);
-  const formattedMissedIngredients = formatIngredients(
-    recipe.missedIngredients
-  );
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Image source={{ uri: recipe.image }} style={styles.image} />
         <Text style={styles.title}>{recipe.title}</Text>
+        <Text style={styles.subtitle}>Used Ingredients: {usedIngredients}</Text>
         <Text style={styles.subtitle}>
-          Used Ingredients: {formattedUsedIngredients}
-        </Text>
-        <Text style={styles.subtitle}>
-          Missed Ingredients: {formattedMissedIngredients}
+          Missed Ingredients: {missedIngredients}
         </Text>
         <Text style={styles.subtitle}>Instructions: </Text>
         <RenderHtml

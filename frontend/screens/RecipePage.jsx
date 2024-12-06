@@ -29,6 +29,7 @@ export default function RecipePage({ navigation }) {
       if (response.ok) {
         const recipeData = await response.json();
         setRecipes(recipeData);
+        console.log(recipeData);
         setLoading(false);
       } else {
         console.log(

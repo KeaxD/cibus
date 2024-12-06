@@ -33,6 +33,15 @@ router.get("/all", auth, async (req, res) => {
   }
 });
 
+router.get("/random", auth, async (req, res) => {
+  try {
+    const randomRecipes = await Recipe.aggregate([{ $sample: { size: 10 } }]);
+    res.status(200).json({ data: randomRecipes });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 async function saveRecipeDataInDatabase(recipeDataArray) {
   const savedRecipes = [];
 
