@@ -19,12 +19,12 @@ Cibus is an inventory management application designed to help businesses keep tr
 - JWT-based authentication
 - Token validation
 - CRUD operations for products and inventory items
-- Recipe management
+- Recipe management depending on items available
 
 ## Technologies Used
 
 - **Backend**: Node.js, Express, MongoDB, Mongoose, JWT
-- **Frontend**: React, Expo
+- **Frontend**: React Native, Expo
 
 ## Getting Started
 
